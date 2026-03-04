@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello MuseumImageController!{% endblock %}
+
+{% block body %}
+    {{ form_start(form) }}
+    <h1>Associer une image à un musée</h1>
+    <span>Identifiant du musée</span>
+    <input type="text" name="museumID">
+    {{ form_widget(form.imageFile) }}
+    <button type="submit">Associer</button>
+    {{ form_end(form) }}
+{% endblock %}

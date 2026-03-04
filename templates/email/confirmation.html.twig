@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Welcome to CARD-stuodio-backend</title>
+    <style>
+        body {
+            background: #F2F6F4;
+            width: 100%;
+            height: 100%;
+            color: black;
+
+            font-size: 17px;
+            color: #7F7F7F;
+        }
+
+    </style>
+</head>
+<body style="background-color: #F2F6F4; margin: 0; padding: 0; font-family: sans-serif;">
+<div>
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #A4BDAE; height: 100px;">
+        <tr>
+            <td></td>
+        </tr>
+    </table>
+
+    <table style="background-color: #F2F6F4;padding: 40px;" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+            <td style="">
+                <p>Bonjour {{ username }},</p>
+                <p>
+                    Merci de votre inscription sur le site officiel de <b>CARD-stuodio-backend</b>. Nous sommes ravis de vous
+                    compter
+                    parmi nous !
+                </p>
+                <p>
+                    Pour activer votre compte, cliquez sur le bouton ci-dessous :
+                </p>
+            </td>
+        </tr>
+        <tr><td style="height: 50px"></td></tr>
+        <tr  >
+            <td>
+                <table cellpadding="0" cellspacing="0" border="0" align="center">
+                    <tr>
+                        <td bgcolor="#A4BDAE" style="border-radius: 12px;">
+                            <a href="{{ signedUrl }}" target="_blank"
+                               style="display: inline-block; padding: 12px 24px; color: white; text-decoration: none; font-weight: bold;">
+                                Vérifier votre compte
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <tr><td style="height: 50px"></td></tr>
+        <tr>
+            <td><p>
+                Si vous avez des questions ou souhaitez en savoir plus, vous pouvez nous contacter
+                directement.<br><br>
+                À bientôt,<br><br>
+            </p></td>
+        </tr>
+
+    </table>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+body {
+
+    background: aliceblue;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+}
+
+form {
+    width: 50%;
+    background: white;
+    padding: 50px;
+    box-sizing: border-box;
+    display: flex
+;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    box-shadow: 3px 0 44px 2px #a5a5a529;
+    border-radius: 20px;
+}
+form input,form .dropzone-container{
+    width: 100%;
+    text-align: center;
+}
+
+button{
+
+    outline: 0;
+    border: 1px solid black;
+    background: white;
+    padding: 5px 20px;
+}
+
+
+
+
+.museumImages{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: start;
+    gap: 20px;
+}
+
+
+.museumImages > div{
+
+    width: 20%;
+    display: flex
+;
+    flex-direction: column;
+    align-items: center;
+     justify-content: center;
+    background: white;
+    border: 1px solid black;
+    padding: 10px;
+}
+
+.museumImages > div img{
+    width: 80%;
+}

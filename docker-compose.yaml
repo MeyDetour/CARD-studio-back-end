@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+    php-apache:
+        build: ./docker/php
+        container_name: symfony_php_apache
+        ports:
+            - "8080:80"
+        volumes:
+            - .:/var/www/html
+        depends_on:
+            - db
+        environment:
+            SYMFONY_ENV: dev
+
+    db:
+        image: postgres:16
+        container_name: symfony_postgres
+        environment:
+            POSTGRES_USER: symfony
+            POSTGRES_PASSWORD: secret
+            POSTGRES_DB: symfony
+        volumes:
+            - db_data:/var/lib/postgresql/data
+        ports:
+            - "5432:5432"
+
+volumes:
+    db_data:

@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello MuseumImageController!{% endblock %}
+
+{% block body %}
+    <div class="museumImages">
+        {% for museum in museumsImages %}
+            <div>
+                {% if museum.image %}
+                    <span>{{ museum.museumId }}</span>
+                    <img src="{{ vich_uploader_asset(museum.image, 'imageFile') }}" alt="{{ museum.image.imageName }}">
+                {% else %}
+                    <span class="red">{{ museum.museumId }} — Pas d'image</span>
+                {% endif %}
+            </div>
+
+        {% endfor %}
+    </div>
+
+{% endblock %}
