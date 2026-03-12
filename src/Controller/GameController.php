@@ -1006,6 +1006,7 @@ final class GameController extends AbstractController
     {    
            return $this->json( $this->getGameObject($game) ,200, [],['groups'=>"game"] );
     }
+ 
 
     private function getGameObject($game){
         $averageNotes = 0;
@@ -1017,7 +1018,7 @@ final class GameController extends AbstractController
         }
             
         return   [
-        "id"=>$game->getId(),
+        "id"=>$game->getId(), 
         "name"=>$game->getName(),
         "image"=>$game->getImage()? $this->imageService->getImageUrl($game->getImage(),    "game" ,'game_image') : null,
         "isPublic"=>$game->isPublic(),

@@ -2,14 +2,13 @@
 
 namespace App\Service;
 
-use App\Entity\Image;
-use App\Repository\ImageRepository;
+use App\Entity\Image; 
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
 class ImageService
 {
-    public function __construct(private UploaderHelper $helper, private CacheManager $cacheManager, private ImageRepository $imageRepository)
+    public function __construct(private UploaderHelper $helper, private CacheManager $cacheManager)
     {
 
     }

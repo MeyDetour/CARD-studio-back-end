@@ -2,10 +2,10 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
-use App\Service\ImageService;
+use App\Repository\UserRepository; 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -19,7 +19,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["profile","share"])]
+    #[Groups(["profile"])]
     private ?int $id = null;
 
 //    #[ORM\Column(length: 180)]
@@ -44,14 +44,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
 
     #[ORM\Column(length: 255)]
-    #[Groups(["profile","share"])]
+    #[Groups(["profile"])]
     private ?string $username = null;
   
     /**
      * @var Collection<int, Game>
-     */
+     */ 
     #[ORM\OneToMany(targetEntity: Game::class, mappedBy: 'creator')]
     private Collection $games;
+
+    #[ORM\Column]
+    #[Groups(["profile"])]
+    private ?bool $displayErrors = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(["profile"])]
+    private ?string $lang = null;
  
  
 
@@ -194,6 +202,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $game->setCreator(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isDisplayErrors(): ?bool
+    {
+        if ($this->displayErrors === null) {
+            return true;
+        }
+        return $this->displayErrors;
+    }
+
+    public function setDisplayErrors(bool $displayErrors): static
+    {
+        $this->displayErrors = $displayErrors;
+
+        return $this;
+    }
+
+    public function getLang(): ?string
+    {
+        return $this->lang;
+    }
+
+    public function setLang(?string $lang): static
+    {
+        $this->lang = $lang;
 
         return $this;
     }

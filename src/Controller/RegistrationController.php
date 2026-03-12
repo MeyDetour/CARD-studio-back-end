@@ -66,9 +66,11 @@ class RegistrationController extends AbstractController
         // Hasher le mot de passe
         $plainPassword = $user->getPassword();
         $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
-
+        $user->setDisplayErrors(true);
+        $user->setLang("en");
         $entityManager->persist($user);
         $entityManager->flush();
+
 
   
 
