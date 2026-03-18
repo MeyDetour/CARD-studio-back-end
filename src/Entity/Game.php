@@ -96,6 +96,7 @@ class Game
     private ?bool $isPublic = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(["game","games"])]
     private ?string $image = null;
 
  

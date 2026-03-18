@@ -24,7 +24,19 @@ final class GameController extends AbstractController
      #[Route('/games', name: 'get_games')]
     public function getGames( GameRepository $gameRepository): Response
     {
-       return $this->json(  $gameRepository->findAll() ,200, [],['groups'=>"games"] );
+        $games = $gameRepository->findBy(["isPublic" => true]);
+        $gamesToSend = [];
+        foreach($games as $game){ 
+            $gameToSend = $this->getGameObject($game);
+            unset($gameToSend["events"]);
+            unset($gameToSend["assets"]);
+            unset($gameToSend["playerGlobalValue"]);
+            unset($gameToSend["globalValue"]);
+            unset($gameToSend["editionHistory"]);  
+            $gamesToSend[] = $gameToSend;
+        }
+
+       return $this->json(  $gamesToSend, 200);
     }
     #[Route('/api/my/games', name: 'get_games_of_user')]
     public function getMyGames( GameRepository $gameRepository,  EntityManagerInterface $manager): Response
@@ -53,19 +65,22 @@ final class GameController extends AbstractController
                   ]
             ]);
             $game->setglobalValue(  [
-                "smallBlind" => ["type" => "number", "value" => 1],
-                "allPlayersHasPlayed" => ["type" => "boolean", "value" => false],
-                "currentBet" => ["type" => "number", "value" => 0],
-                "state" => ["type" => "string", "value" => "waitingPlayers"],
+                "smallBlind" => ["type" => "number", "value" => 1,"id"=>1],
+                "allPlayersHasPlayed" => ["type" => "boolean", "value" => false,"id"=>2],
+                "currentBet" => ["type" => "number", "value" => 0,"id"=>3],
+                "state" => ["type" => "string", "value" => "waitingPlayers","id"=>4],
                 "deck" => [
+                    "id"=>5,
                     "type" => "cardList",
                     "value" => range(1, 52) // Plus propre que d'écrire 1 à 52
                 ],
                 "discardDeck" => [
+                        "id"=>6,
                     "type" => "cardList",
                     "value" => [5, 2, 3, 4]
                 ],
                 "groupPot" => [
+                        "id"=>7,
                     "type" => "gainObject",
                     "value" => [
                         "gain" => [
@@ -75,28 +90,32 @@ final class GameController extends AbstractController
                     ]
                 ],
                 "gain" => [
+                    "id"=>8,
                     "type" => "gainObject",
                     "value" => ["1" => ["value" => 0]]
                 ],
-                "boardCard" => ["type" => "cardList", "value" => []],
-                "winners" => ["type" => "playerList", "value" => []]
+                "boardCard" => [
+                "id"=>9,    
+                "type" => "cardList", "value" => []],
+                "winners" => [
+                    "id"=>10,
+                    "type" => "playerList", "value" => []]
             ] );
             
             $game->setPlayerGlobalValue([
                 "currentBet" => [
                     "type" => "number",
-                    "value" => 0
+                    "value" => 0,
+                    "id" => 1,
+                    "display" => true,
                 ],
                 "attachedEventForTour" => [
                     "type" => "array",
-                    "value" => []
-                ],
-                "gain" => [
-                    "type" => "object",
-                    "value" => [
-                        "1" => ["value" => 0]
-                    ]
+                    "value" => [],
+                    "id" => 2,
+                    "display" => false,
                 ]
+                
             ]);
             $game->setParams([
                 'globalGame' => [
