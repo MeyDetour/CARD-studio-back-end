@@ -66,40 +66,8 @@ final class GameController extends AbstractController
             ]);
             $game->setglobalValue(  [
                 "smallBlind" => ["type" => "number", "value" => 1,"id"=>1],
-                "allPlayersHasPlayed" => ["type" => "boolean", "value" => false,"id"=>2],
-                "currentBet" => ["type" => "number", "value" => 0,"id"=>3],
-                "state" => ["type" => "string", "value" => "waitingPlayers","id"=>4],
-                "deck" => [
-                    "id"=>5,
-                    "type" => "cardList",
-                    "value" => range(1, 52) // Plus propre que d'écrire 1 à 52
-                ],
-                "discardDeck" => [
-                        "id"=>6,
-                    "type" => "cardList",
-                    "value" => [5, 2, 3, 4]
-                ],
-                "groupPot" => [
-                        "id"=>7,
-                    "type" => "gainObject",
-                    "value" => [
-                        "gain" => [
-                            "type" => "gainObject",
-                            "value" => ["1" => ["value" => 0]]
-                        ]
-                    ]
-                ],
-                "gain" => [
-                    "id"=>8,
-                    "type" => "gainObject",
-                    "value" => ["1" => ["value" => 0]]
-                ],
-                "boardCard" => [
-                "id"=>9,    
-                "type" => "cardList", "value" => []],
-                "winners" => [
-                    "id"=>10,
-                    "type" => "playerList", "value" => []]
+               "currentBet" => ["type" => "number", "value" => 0,"id"=>3]
+              
             ] );
             
             $game->setPlayerGlobalValue([
@@ -117,6 +85,7 @@ final class GameController extends AbstractController
                 ]
                 
             ]);
+            $game->setglobalValueStatic([]);
             $game->setParams([
                 'globalGame' => [
                     'jeuSolo' => false,
@@ -919,6 +888,7 @@ final class GameController extends AbstractController
             $game->setEditionHistory([ ]);
             $game->setglobalValue(  [ ] );
             
+            $game->setglobalValueStatic([]);
             $game->setPlayerGlobalValue([  ]);
             $game->setParams([
                 'globalGame' => [
@@ -932,9 +902,15 @@ final class GameController extends AbstractController
                         'template' => 1,
                         'backgroundImage' => null,
                     ],
-                    'game' => [
+                     'game' => [
                         'template' => 1,
                         'backgroundImage' => null,
+                        'displayHandDeck'=>true,
+                        'displayCountAdversaryHandDeck'=>true,
+                        'displayStatistics'=>true,
+                        'displayHistory'=>true,
+                        'displayTimer'=>false,
+                        'displayChat'=>true,
                     ],
                 ],
                 'tours' => [
@@ -987,7 +963,30 @@ final class GameController extends AbstractController
             ]);
            
             $game->setEventWithValueEvents([ ]); 
-            $game->setAssetsCard([]);
+              $cardsConfig = [];
+  $colors = [
+                'pique'   => range(1, 13),
+                'treffle' => range(14, 26),
+                'coeur'   => range(27, 39),
+                'carreau' => range(40, 52),
+            ];
+            foreach ($colors as $colorName => $range) {
+                foreach ($range as $index => $id) {
+                    // La valeur de la carte va de 1 à 13 pour chaque couleur
+                    $value = $index + 1; 
+
+                    $cardsConfig[$id] = [
+                        'id' => $id,
+                        'value' => $value,
+                        'type' => "french_standard",
+                        'addedAttributs' => [
+                            'couleur' => $colorName
+                        ]
+                    ];
+                }
+            }
+
+            $game->setAssetsCard($cardsConfig);
             $game->setAssetsGain([]);
             $game->setRoles([]);
             $manager->persist($game)  ;
@@ -1049,6 +1048,7 @@ final class GameController extends AbstractController
         "types"=>$game->getTypes(), 
         "editionHistory"=>$game->getEditionHistory(),
         "globalValue"=>$game->getglobalValue(),
+        "globalValueStatic"=>$game->getglobalValueStatic() ?? [],
         "playerGlobalValue"=>$game->getPlayerGlobalValue(),
         "params"=>$game->getParams(),
         "events"=>[
@@ -1087,28 +1087,52 @@ final class GameController extends AbstractController
             return $this->json(["message" => "Visibility must be defined. (field : isPublic, value : true,false)"], 406);
         };
          
+        if($gameEdited->getName()){
         $game->setName($gameEdited->getName());
+        } 
+        if ($gameEdited->getDescription()){
         $game->setDescription($gameEdited->getDescription());
+        };
+        if ($gameEdited->getTypes()){
         $game->setTypes($gameEdited->getTypes());
+        };
+        if ($gameEdited->isPublic() !== null){
         $game->setIsPublic($gameEdited->isPublic());
+        }
+        if( $gameEdited->getPlayerGlobalValue()){
         $game->setPlayerGlobalValue($gameEdited->getPlayerGlobalValue());
+        };
+        if( $gameEdited->getglobalValueStatic()){
+        $game->setglobalValueStatic($gameEdited->getglobalValueStatic());
+        };
+        if( $gameEdited->getEditionHistory()){
         $game->setEditionHistory($gameEdited->getEditionHistory());
+        };
+        if ( $gameEdited->getglobalValue()){
         $game->setglobalValue($gameEdited->getglobalValue());
+        };
+        if ( $gameEdited->getParams()){
         $game->setParams($gameEdited->getParams());
-        
+        };
        
-        $arrayFields = [
-            'editionHistory', 'globalValue', 'playerGlobalValue', 
-            'params', 'EventDemons', 'EventEvents', 
-            'EventWithValueEvents', 'assetsCard', 'assetsGain', 'roles'
-        ];
- 
+        if( $gameEdited->getEventEvents()){
         $game->setEventEvents($data["EventEvents"]);
+        };
+        if ( $gameEdited->getEventDemons()){
         $game->setEventDemons($data["EventDemons"]);
+        };
+        if( $gameEdited->getEventWithValueEvents()){
         $game->setEventWithValueEvents($data["EventWithValueEvents"]);
+        };
+        if( $gameEdited->getAssetsCard()){
         $game->setAssetsCard($data["assetsCard"]);
+        };
+        if( $gameEdited->getAssetsGain()){
         $game->setAssetsGain($data["assetsGain"]);
+        };
+        if( $gameEdited->getRoles()){
         $game->setRoles($data["roles"]);
+        };
         $manager->persist($game);
         $manager->flush();
         return $this->json( $this->getGameObject($game) ,200, [],['groups'=>"games"] );

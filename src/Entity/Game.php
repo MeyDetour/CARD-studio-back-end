@@ -46,6 +46,10 @@ class Game
     #[Groups(["game"])]
     private array $globalValue = [];
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(["game"])]
+    private array $globalValueStatic = [];
+
     #[ORM\Column]
     #[Groups(["game"])]
     private array $playerGlobalValue = [];
@@ -97,13 +101,14 @@ class Game
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(["game","games"])]
-    private ?string $image = null;
+    private ?string $image = null; 
 
  
 
     public function __construct()
     {
         $this->notes = new ArrayCollection(); 
+        $this->globalValueStatic = [];
     }
 
     public function getId(): ?int
@@ -190,6 +195,20 @@ class Game
     public function setglobalValue(array $globalValue): static
     {
         $this->globalValue = $globalValue;
+
+        return $this;
+    }
+
+    public function getglobalValueStatic(): array
+    {if (!isset($this->globalValueStatic)) {
+        return [];
+    }
+    return $this->globalValueStatic;
+    }
+
+    public function setglobalValueStatic(array $globalValueStatic): static
+    {
+        $this->globalValueStatic = $globalValueStatic;
 
         return $this;
     }
@@ -354,6 +373,7 @@ class Game
 
         return $this;
     }
+ 
 
  
 }

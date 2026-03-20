@@ -10,9 +10,9 @@ liip_imagine:
     filter_sets:
          cache: ~
          game_image:
-             quality: 45
+             quality: 100
              filters:
-                 thumbnail: { size: [900, 400], mode: outbound }
+                 thumbnail: { size: [300,300], mode: outbound }
 
          card_image:
              quality: 80
