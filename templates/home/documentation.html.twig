@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Documentation{% endblock %}
+
+{% block body %} 
+ 	<div class="documentation container">
+		<nav>
+			<h1>DOC4U</h1> 
+			<div class="scrollContainerNav">
+                {% for key,value in routes %}
+
+                    <hr> 
+                    <h4>{{key}}</h4>
+                    <hr> 
+                    <ul>
+                    {% for route in value %}
+                        <li class="{{  currentRoute !=null  and route.route == currentRoute.route ? 'focus' : '' }}">
+                            <a href="/documentation?route={{ route.route }}">{{ route.methode }}: {{ route.route }}</a>
+                        </li> 
+                    {% endfor %}  
+                    </ul>
+                {% endfor %}
+               
+			</div>
+		</nav>
+		<div class="content"> 
+            {% if currentRoute == null %}
+                <div class="empty">
+                    <h2>Sélectionnez une route pour voir sa documentation</h2>
+                </div>
+            {% else %}
+
+			<!--MENTION-->
+			<div class="mentions">
+				<span>@author Genos Center</span>
+				<span>@since 2026</span>
+				<span>@version 1.0.0</span>
+			</div>
+
+			<!--HEADER-->
+			<div class="requestData">
+				<h2>{{currentRoute.methode}}</h2>
+				<span class="routeUrl">{{currentRoute.route}}</span>
+			</div>
+			<div class="description">
+				<p>{{currentRoute.description}}</p>
+			</div>
+                <div class="preContainers">
+				 	<pre>{{ currentRoute.body|json_encode(constant('JSON_PRETTY_PRINT')) }}<span class="preLabel">Body</span></pre>
+				</div> <div class="preContainers">
+				 	<pre>{{ currentRoute.sendBack|json_encode(constant('JSON_PRETTY_PRINT')) }}<span class="preLabel">Send Back</span></pre>
+				</div>
+
+                {% endif %}
+	 	</div>
+	</div>
+{% endblock %} 

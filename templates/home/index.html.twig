@@ -1,20 +1,72 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}CARD Studio{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+ 
+<div class="home-container">
+    <div class="firstSection">
+        <h1>Créez vôtre jeu de cartes<br>en ligne facilement</h1>
+        <p>Une interface professionnelle créer pour vous aider à concevoir, éditer et jouer à vos jeux de cartes personnalisés avec vos amis.</p>
+       
+       <div class="buttonContainer">
+            <a class="greyButton" href="card-studio.genos-center.com/"><span>Commencer maintenant</span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3.33331 8H12.6666" stroke="white" style="stroke:white;stroke-opacity:1;" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 3.33325L12.6667 7.99992L8 12.6666" stroke="white" style="stroke:white;stroke-opacity:1;" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+            <a class="borderButton" href="/documentation">Voir la documentation</a> 
+        </div>
+    </div>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/home/mey/PhpstormProjects/CARD-stuodio-backend/src/Controller/HomeController.php</code></li>
-        <li>Your template at <code>/home/mey/PhpstormProjects/CARD-stuodio-backend/templates/home/index.html.twig</code></li>
-    </ul>
+    <div class="secondSection">
+            {% set features = [
+                {
+                    'icon': 'bi-stars',
+                    'title': 'Création de cartes',
+                    'desc': 'Concevez des cartes uniques avec des images, textes et attributs personnalisés grâce à notre éditeur intuitif.'
+                },
+                {
+                    'icon': 'bi-palette',
+                    'title': 'Gestion des couleurs',
+                    'desc': 'Créez une identité visuelle cohérente avec notre système de gestion de palettes et de thèmes.'
+                },
+                {
+                    'icon': 'bi-people',
+                    'title': 'Mode multijoueur',
+                    'desc': 'Invitez vos amis et jouez ensemble en ligne. Testez vos créations en temps réel.'
+                },
+                {
+                    'icon': 'bi-controller',
+                    'title': 'Templates de jeux',
+                    'desc': 'Démarrez rapidement avec des templates pré-configurés ou créez votre jeu de zéro.'
+                },
+                {
+                    'icon': 'bi-database',
+                    'title': 'Variables globales',
+                    'desc': 'Gérez facilement les règles et mécaniques de jeu avec notre système de variables.'
+                },
+                {
+                    'icon': 'bi-lightning-charge',
+                    'title': 'Événements et déclencheurs',
+                    'desc': "Créez des mécaniques complexes avec notre système d'événements et de conditions."
+                }
+            ] %}
+        
+            {% for feature in features %}
+                <div class="feature-card">
+                    <div class="icon-wrapper">
+                        <i class="bi {{ feature.icon }}"></i>
+                    </div>
+                    <h3>{{ feature.title }}</h3>
+                    <p>{{ feature.desc }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
 </div>
+<footer>
+<p>© 2024 CARD Studio. Tous droits réservés. <a href="/mentions-legales">Mentions légales</a></p>
+</footer>
 {% endblock %}
