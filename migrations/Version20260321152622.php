@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20260320095016 extends AbstractMigration
+final class Version20260321152622 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,13 +20,15 @@ final class Version20260320095016 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE game ADD global_value_static JSON DEFAULT NULL');
+        $this->addSql('ALTER TABLE game ADD event_win JSON DEFAULT NULL');
+        $this->addSql('ALTER TABLE game ADD event_loose JSON DEFAULT NULL');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE SCHEMA public');
-        $this->addSql('ALTER TABLE game DROP global_value_static');
+        $this->addSql('ALTER TABLE game DROP event_win');
+        $this->addSql('ALTER TABLE game DROP event_loose');
     }
 }

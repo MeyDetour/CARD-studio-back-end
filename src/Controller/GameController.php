@@ -218,7 +218,8 @@ final class GameController extends AbstractController
                     "activation" => true,
                 ]
             ]);
-
+            $game->setEventWin([]);
+            $game->setEventLoose([]);
             $game->setEventDemons(
                 [ 
                 // La partie se lance après que tous les démons se soient activés si etat != start
@@ -961,6 +962,8 @@ final class GameController extends AbstractController
             $game->setEventEvents([
 
             ]);
+            $game->setEventWin([]);
+            $game->setEventLoose([]);
            
             $game->setEventWithValueEvents([ ]); 
               $cardsConfig = [];
@@ -1054,6 +1057,8 @@ final class GameController extends AbstractController
         "events"=>[
             "demons"=>$game->getEventDemons(),
             "events"=>$game->getEventEvents(),
+            "win"=>$game->getEventWin(),
+            "loose"=>$game->getEventLoose(),
             "withValueEvent"=>$game->getEventWithValueEvents()
         ],
         "assets"=>[
@@ -1120,6 +1125,12 @@ final class GameController extends AbstractController
         };
         if ( $gameEdited->getEventDemons()){
         $game->setEventDemons($data["EventDemons"]);
+        };
+        if ( $gameEdited->getEventWin()){
+        $game->setEventWin($data["EventWin"]);
+        };
+        if ( $gameEdited->getEventLoose()){
+        $game->setEventLoose($data["EventLoose"]);
         };
         if( $gameEdited->getEventWithValueEvents()){
         $game->setEventWithValueEvents($data["EventWithValueEvents"]);

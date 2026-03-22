@@ -62,6 +62,14 @@ class Game
     #[Groups(["game"])]
     private array $EventDemons = [];
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(["game"])]
+    private array $EventWin= [];
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(["game"])]
+    private array $EventLoose = [];
+
     #[ORM\Column]
     #[Groups(["game"])]
     private array $EventEvents = [];
@@ -245,6 +253,36 @@ class Game
     public function setEventDemons(array $EventDemons): static
     {
         $this->EventDemons = $EventDemons;
+
+        return $this;
+    }
+
+
+    public function getEventWin(): array
+    {if (!isset($this->EventWin)) {
+        return [];
+    }
+        return $this->EventWin;
+    }
+
+    public function setEventWin(array $EventWin): static
+    {
+        $this->EventWin = $EventWin;
+
+        return $this;
+    }
+
+
+    public function getEventLoose(): array
+    {if (!isset($this->EventLoose)) {
+        return [];
+    }
+        return $this->EventLoose;
+    }
+
+    public function setEventLoose(array $EventLoose): static
+    {
+        $this->EventLoose = $EventLoose;
 
         return $this;
     }
