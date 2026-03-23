@@ -21,6 +21,18 @@ final class GameController extends AbstractController
         $this->imageService = $imageService;
     }
 
+#[Route('/api/test-token', name: 'app_test_token')]
+public function testToken(Request $request): Response
+{
+    // Récupère le header brut
+    $authHeader = $request->headers->get('Authorization');
+    
+    return $this->json([
+        'header_recu' => $authHeader,
+        'user' => $this->getUser() ? $this->getUser()->getUserIdentifier() : 'Anonyme'
+    ]);
+}
+
      #[Route('/games', name: 'get_games')]
     public function getGames( GameRepository $gameRepository): Response
     {
