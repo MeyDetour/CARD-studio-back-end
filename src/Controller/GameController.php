@@ -21,7 +21,7 @@ final class GameController extends AbstractController
         $this->imageService = $imageService;
     }
 
-#[Route('/api/test-token', name: 'app_test_token')]
+#[Route('/test-token', name: 'app_test_token')]
 public function testToken(Request $request): Response
 {
     // Récupère le header brut
