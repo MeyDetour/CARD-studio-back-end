@@ -29,7 +29,7 @@ public function testToken(Request $request): Response
     
     return $this->json([
         'header_recu' => $authHeader,
-        'user' => $this->getUser() ? $this->getUser()->getUserIdentifier() : 'Anonyme'
+        'user' => $this->getUser()
     ]);
 }
 
