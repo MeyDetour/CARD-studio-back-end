@@ -973,7 +973,16 @@ dd(
             $game->setEventEvents([
 
             ]);
-            $game->setEventWin([]);
+            $game->setEventWin([
+                "applyOnAllPlayers" => true,
+                "allElementOfBoucleMustSatisyCondition"=>false,
+                "manyPlayersCanBeWinner"=>true,
+                "displayPoints"=>[
+                    "activation"=>false
+
+                ]
+
+            ]);
             $game->setEventLoose([]);
            
             $game->setEventWithValueEvents([ ]); 
