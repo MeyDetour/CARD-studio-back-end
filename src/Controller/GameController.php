@@ -880,8 +880,18 @@ public function testToken(Request $request): Response
             $manager->persist($game)  ;
             $manager->flush(); 
         };
-          $myGames = $gameRepository->findBy(["creator"=>$this->getUser()]);
-        return $this->json(  $myGames ,200, [],['groups'=>"games"] );
+        $games = $gameRepository->findBy(["creator"=>$this->getUser()]);
+      
+        foreach($games as $game){ 
+            $gameToSend = $this->getGameObject($game);
+            unset($gameToSend["events"]);
+            unset($gameToSend["assets"]);
+            unset($gameToSend["playerGlobalValue"]);
+            unset($gameToSend["globalValue"]);
+            unset($gameToSend["editionHistory"]);  
+            $gamesToSend[] = $gameToSend;
+        }
+        return $this->json(  $games ,200, [],['groups'=>"games"] );
     }
      
     #[Route('/api/new/game', name: 'new_game')]
