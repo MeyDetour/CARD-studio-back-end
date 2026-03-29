@@ -1,8 +1,7 @@
 <?php
 
 namespace App\Service;
-
-use App\Entity\Image; 
+ 
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
@@ -15,7 +14,17 @@ class TypeService
 
     public function verify($value,$type)
     {
-
+        if ($type === "string") {
+            if (!is_string($value)) {
+                return false;
+            }
+        } elseif ($type === "number") {
+            if (!is_numeric($value)) {
+                return false;
+            }
+        } else {
+            return false; 
+        }
        return true; 
     }
 }

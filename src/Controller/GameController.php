@@ -26,10 +26,10 @@ public function testToken(Request $request): Response
 {
     // Récupère le header brut
     $authHeader = $request->headers->get('Authorization');
-dd(
-    $request->headers->get('Authorization'),
-    $this->container->get('security.token_storage')->getToken()
-);
+    dd(
+        $request->headers->get('Authorization'),
+        $this->container->get('security.token_storage')->getToken()
+    );
 }
 
      #[Route('/games', name: 'get_games')]
@@ -1050,9 +1050,15 @@ dd(
  
 
     private function getGameObject($game){
-        $averageNotes = 0;
+        $averageNotes = 0; 
+        $notes = [];
         foreach ($game->getNotes() as $note){
             $averageNotes += $note->getRate();
+         $notes[] = [
+            "id"=>$note->getId(),
+            "rate"=>$note->getRate(),
+            "comment"=>$note->getDescription()
+         ] ;
         }
         if ($averageNotes > 0 ){
                 $averageNotes = ($averageNotes/count($game->getNotes()) ) ;
@@ -1064,9 +1070,9 @@ dd(
         "image"=>$game->getImage()? $this->imageService->getImageUrl($game->getImage(),    "game" ,'game_image') : null,
         "isPublic"=>$game->isPublic(),
         "description"=>$game->getDescription(),
-        "averageNotes"=>$averageNotes,
-        "notes"=>$game->getNotes(),
+        "averageNotes"=>$averageNotes, 
         "playerCount"=>$game->getPlayerCount(),
+        "notes"=>$notes,
         "gameCount"=>$game->getGameCount(),
         "types"=>$game->getTypes(), 
         "editionHistory"=>$game->getEditionHistory(),
