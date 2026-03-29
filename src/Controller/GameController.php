@@ -881,6 +881,7 @@ public function testToken(Request $request): Response
             $manager->flush(); 
         };
         $games = $gameRepository->findBy(["creator"=>$this->getUser()]);
+            $gamesToSend = [];
       
         foreach($games as $game){ 
             $gameToSend = $this->getGameObject($game);
@@ -891,7 +892,7 @@ public function testToken(Request $request): Response
             unset($gameToSend["editionHistory"]);  
             $gamesToSend[] = $gameToSend;
         }
-        return $this->json(  $games ,200, [],['groups'=>"games"] );
+        return $this->json(  $gamesToSend ,200, [],['groups'=>"games"] );
     }
      
     #[Route('/api/new/game', name: 'new_game')]
