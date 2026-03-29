@@ -1068,7 +1068,8 @@ public function testToken(Request $request): Response
          $notes[] = [
             "id"=>$note->getId(),
             "rate"=>$note->getRate(),
-            "comment"=>$note->getDescription()
+            "comment"=>$note->getDescription(),
+            "date"=>$note->getDate()->format("Y-m-d"),
          ] ;
         }
         if ($averageNotes > 0 ){
