@@ -149,6 +149,9 @@ class Game
 
     public function getPlayerCount(): ?int
     {
+        if (!isset($this->playerCount)) {
+            return 0;
+        }
         return $this->playerCount;
     }
 

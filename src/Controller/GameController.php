@@ -1073,7 +1073,7 @@ public function testToken(Request $request): Response
          ] ;
         }
         if ($averageNotes > 0 ){
-                $averageNotes = ($averageNotes/count($game->getNotes()) ) ;
+                $averageNotes = round($averageNotes/count($game->getNotes()) , 1) ;
         }
             
         return   [
@@ -1187,8 +1187,18 @@ public function testToken(Request $request): Response
         return $this->json( $this->getGameObject($game) ,200, [],['groups'=>"games"] );
         
     }
+
+     #[Route('/game/{id}/one/more/player', name: 'add_player_count_in_game')]
+    public function addPlayerCountInGame(Game $game ,  EntityManagerInterface $manager ): Response
+    {    
+     
+        $game->setPlayerCount($game->getPlayerCount() + 1);
+        $manager->persist($game);
+        $manager->flush();
+        return $this->json(["message"=> "ok"],200, []);
+    }
     
-      #[Route('/api/game/upload-image/{id}', name: 'app_image',methods: ['POST'])]
+     #[Route('/api/game/upload-image/{id}', name: 'app_image',methods: ['POST'])]
     public function index(Game $game, Request $request, EntityManagerInterface $em, Filesystem $filesystem): Response
     {
  
