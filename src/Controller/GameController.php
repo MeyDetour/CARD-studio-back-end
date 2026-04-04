@@ -1078,6 +1078,7 @@ public function testToken(Request $request): Response
             
         return   [
         "id"=>$game->getId(), 
+        "requestDate"=>new \DateTime(),
         "name"=>$game->getName(),
         "image"=>$game->getImage()? $this->imageService->getImageUrl($game->getImage(),    "game" ,'game_image') : null,
         "isPublic"=>$game->isPublic(),
