@@ -1300,19 +1300,19 @@ public function testToken(Request $request): Response
       #[Route('api/game/{id}/edit/card/{cardId}', name: 'edit_card')]
     public function editCard(Game $game ,  $cardId,SerializerInterface $serializer, EntityManagerInterface $manager, Request $request , TypeService $typeService): Response
     {    
-      $data = json_decode($request->getContent(), true);
-    if (!$data) {
-        return $this->json(['message' => 'Données JSON invalides'], 400);
-    }
- 
-    $assetsCards = $game->getAssetsCard() ?? []; 
- 
-    if (isset($assetsCards[$cardId])) { 
-        $assetsCards[$cardId] = array_merge($assetsCards[$cardId], $data);
-    } else { 
-        $data['id'] = $cardId; 
-        $assetsCards[$cardId] = $data;
-    }
+        $data = json_decode($request->getContent(), true);
+        if (!$data) {
+            return $this->json(['message' => 'Données JSON invalides'], 400);
+        }
+    
+        $assetsCards = $game->getAssetsCard() ?? []; 
+    
+        if (isset($assetsCards[$cardId])) { 
+            $assetsCards[$cardId] = array_merge($assetsCards[$cardId], $data);
+        } else { 
+            $data['id'] = $cardId; 
+            $assetsCards[$cardId] = $data;
+        }
 
         $manager->persist($game);
         $manager->flush();
