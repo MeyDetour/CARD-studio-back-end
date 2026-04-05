@@ -1128,7 +1128,7 @@ public function testToken(Request $request): Response
         };
 
         if (!$typeService->verify($gameEdited->isPublic(), "bool")) {
-            return $this->json(["message" => "Visibility must be defined. (field : isPublic, value : true,false)"], 406);
+            return $this->json(["message" => "isPublic must be defined. (field : isPublic, value : true,false)"], 406);
         };
          
         if($gameEdited->getName()){

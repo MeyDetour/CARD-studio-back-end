@@ -22,6 +22,10 @@ class TypeService
             if (!is_numeric($value)) {
                 return false;
             }
+        } elseif ($type === "boolean") {
+            if (!is_bool($value)) {
+                return false;
+            }
         } else {
             return false; 
         }
