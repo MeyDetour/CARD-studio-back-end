@@ -1313,7 +1313,9 @@ public function testToken(Request $request): Response
             $data['id'] = $cardId; 
             $assetsCards[$cardId] = $data;
         }
-
+$game->setAssetsCard($assetsCards); 
+ 
+    $manager->getUnitOfWork()->computeChangeSets();  
         $manager->persist($game);
         $manager->flush();
         return $this->json( $this->getGameObject($game) ,200, [],['groups'=>"games"] );
