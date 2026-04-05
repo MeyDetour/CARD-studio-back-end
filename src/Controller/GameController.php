@@ -1297,7 +1297,8 @@ public function testToken(Request $request): Response
                 'filename' => $newFilename
             ]);
     }   
-      #[Route('api/game/{id}/edit/card/{cardId}', name: 'edit_card')]
+    
+    #[Route('api/game/{id}/edit/card/{cardId}', name: 'edit_card')]
     public function editCard(Game $game ,  $cardId,SerializerInterface $serializer, EntityManagerInterface $manager, Request $request , TypeService $typeService): Response
     {    
         $data = json_decode($request->getContent(), true);
@@ -1313,9 +1314,9 @@ public function testToken(Request $request): Response
             $data['id'] = $cardId; 
             $assetsCards[$cardId] = $data;
         }
-$game->setAssetsCard($assetsCards); 
+        $game->setAssetsCard($assetsCards); 
  
-    $manager->getUnitOfWork()->computeChangeSets();  
+        $manager->getUnitOfWork()->computeChangeSets();  
         $manager->persist($game);
         $manager->flush();
         return $this->json( $this->getGameObject($game) ,200, [],['groups'=>"games"] );

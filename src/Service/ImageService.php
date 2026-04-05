@@ -18,7 +18,7 @@ class ImageService
     $path = 'images/'.$folder.'/'.$imageName; 
 
     try {
-        return $this->cacheManager->getBrowserPath($path, $filter);
+        return $this->cacheManager->generateUrl($path, $filter);
     } catch (\Exception $e) { 
         return '/images/'.$folder.'/'.$imageName; 
     }
