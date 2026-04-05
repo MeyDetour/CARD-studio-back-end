@@ -647,6 +647,34 @@ $routes = [
             'token' => true
         ]
     ],
+      'Carte' => [
+                [
+                    'name' => 'Edit card',
+                    'route' => '/api/game/{gameId}/edit/card/{cardId}',
+                    'methode' => 'PUT',
+                    'description' => 'Modifie une carte spécifique d\'un jeu.',
+                    'body' => [
+                        'id' => 'number',
+                        'value' => 'number',
+                        'type' => 'string',
+                        'addedAttributs' => [
+                            'couleur' => 'string'
+                        ],
+                        // autres champs modifiables selon la structure de la carte
+                    ],
+                    'sendBack' => ['game' => 'object'],
+                    'token' => true
+                ],
+                [
+                    'name' => 'Upload card image',
+                    'route' => '/api/game/{gameId}/card/{cardId}/uploadImage',
+                    'methode' => 'POST',
+                    'description' => 'Ajoute ou remplace l\'image d\'une carte.',
+                    'body' => ['file' => 'image (NOT NULL)'],
+                    'sendBack' => ['filename' => 'string'],
+                    'token' => true
+                ]
+            ],
     'Note' => [
         [
             'name' => 'Note page',
