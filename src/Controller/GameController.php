@@ -837,7 +837,7 @@ public function testToken(Request $request): Response
             ]);
             $colors = [
                 'pique'   => range(1, 13),
-                'treffle' => range(14, 26),
+                'trefle' => range(14, 26),
                 'coeur'   => range(27, 39),
                 'carreau' => range(40, 52),
             ];
@@ -1000,7 +1000,7 @@ public function testToken(Request $request): Response
               $cardsConfig = [];
   $colors = [
                 'pique'   => range(1, 13),
-                'treffle' => range(14, 26),
+                'trefle' => range(14, 26),
                 'coeur'   => range(27, 39),
                 'carreau' => range(40, 52),
             ];
@@ -1200,7 +1200,7 @@ public function testToken(Request $request): Response
     }
     
      #[Route('/api/game/upload-image/{id}', name: 'app_image',methods: ['POST'])]
-    public function index(Game $game, Request $request, EntityManagerInterface $em, Filesystem $filesystem): Response
+    public function addGameImage(Game $game, Request $request, EntityManagerInterface $em, Filesystem $filesystem): Response
     {
  
 
@@ -1231,4 +1231,40 @@ public function testToken(Request $request): Response
             'filename' => $newFilename
         ]);
     }
+      #[Route('/api/game/{id}/card/{cardId}/uploadImage', name: 'card_image',methods: ['POST'])]
+    public function addCardImage(Game $game, $cardId, Request $request, EntityManagerInterface $em, Filesystem $filesystem): Response
+    { 
+        $assetsCards = $game->getAssetsCard(); 
+        if (!isset($assetsCards[$cardId])) {
+            return $this->json(['message' => 'Carte non trouvée.'], 404);
+        }
+
+        $folder = $this->getParameter('images_directory') . '/cards';
+        $oldImage = $assetsCards[$cardId]["image"] ?? null;
+        if ($oldImage) {
+            $oldPath = $folder . '/' . $oldImage;
+            if ($filesystem->exists($oldPath)) {
+                $filesystem->remove($oldPath);
+            }
+        }
+
+        $file = $request->files->get('file');
+        if (!$file) {
+            return $this->json(['message' => 'Aucun fichier reçu'], 400);
+        }
+
+        $newFilename = uniqid() . '.' . $file->guessExtension();
+        $file->move($folder, $newFilename);
+        $assetsCards[$cardId]["image"] = $newFilename;
+        
+        $game->setAssetsCard($assetsCards);
+
+        // 6. Sauvegarde
+        $em->persist($game);
+        $em->flush();
+            return $this->json([
+                'message' => 'Image ajoutée avec succès',
+                'filename' => $newFilename
+            ]);
+    }   
 }
