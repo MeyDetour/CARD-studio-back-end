@@ -13,6 +13,7 @@ use App\Service\TypeService;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function PHPUnit\Framework\isEmpty;
 
@@ -1085,7 +1086,7 @@ public function testToken(Request $request): Response
                 $cards[$id]['image'] = $this->imageService->getImageUrl(
                     $card['image'], 
                     "game", 
-                    'game_image'
+                    'card_image'
                 );
             } else {
                 $cards[$id]['image'] = null;
@@ -1249,7 +1250,7 @@ public function testToken(Request $request): Response
         ]);
     }
       #[Route('/api/game/{id}/card/{cardId}/uploadImage', name: 'card_image',methods: ['POST'])]
-    public function addCardImage(Game $game, $cardId, Request $request, EntityManagerInterface $em, Filesystem $filesystem): Response
+    public function addCardImage(Game $game, $cardId, Request $request, EntityManagerInterface $em, TranslatorInterface $translator,Filesystem $filesystem): Response
     { 
         $assetsCards = $game->getAssetsCard(); 
         if (!isset($assetsCards[$cardId])) {
@@ -1259,7 +1260,6 @@ public function testToken(Request $request): Response
         $oldImage = $assetsCards[$cardId]["image"] ?? null;
         
         $folder = $this->getParameter('images_directory') . '/cards';
-        dd($oldImage);
         if (!isEmpty($oldImage)) {
             $oldPath = $folder . '/' . $oldImage;
             if ($filesystem->exists($oldPath)) {
@@ -1267,15 +1267,26 @@ public function testToken(Request $request): Response
             }
         }
 
-        $file = $request->files->get('file');
+        $file = $request->files->get('file'); 
         if (!$file) {
-            return $this->json(['message' => 'Aucun fichier reçu'], 400);
+            return $this->json(['message' => $translator->trans('file_not_found')], 400);
+        }
+
+        if (!$file->isValid()) {
+            // On récupère le message d'erreur de PHP/Symfony et on le traduit
+            $errorMessage = $translator->trans($file->getErrorMessage());
+            
+            return $this->json([
+                'message' => 'Erreur d\'upload : ' . $errorMessage,
+                'code' => $file->getError()
+            ], 400);
         }
 
         $newFilename = uniqid() . '.' . $file->guessExtension();
+ 
         $file->move($folder, $newFilename);
         $assetsCards[$cardId]["image"] = $newFilename;
-        
+         
         $game->setAssetsCard($assetsCards);
 
         // 6. Sauvegarde
