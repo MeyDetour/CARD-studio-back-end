@@ -17,4 +17,4 @@ liip_imagine:
         card_image:
              quality: 80
              filters:
-                 thumbnail: { size: [400,900], mode: outbound }
+                 thumbnail: { size: [400,900], mode: outbound, allow_upscale: true }
