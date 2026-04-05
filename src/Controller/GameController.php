@@ -1259,7 +1259,7 @@ public function testToken(Request $request): Response
         
         $oldImage = $assetsCards[$cardId]["image"] ?? null;
         
-        $folder = $this->getParameter('images_directory') . '/cards';
+        $folder = $this->getParameter('images_directory') . '/card';
         if (!isEmpty($oldImage)) {
             $oldPath = $folder . '/' . $oldImage;
             if ($filesystem->exists($oldPath)) {
