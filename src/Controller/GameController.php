@@ -1085,7 +1085,7 @@ public function testToken(Request $request): Response
             if (isset($card['image']) && $card['image']) {
                 $cards[$id]['image'] = $this->imageService->getImageUrl(
                     $card['image'], 
-                    "game", 
+                    "card", 
                     'card_image'
                 );
             } else {
