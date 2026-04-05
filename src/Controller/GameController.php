@@ -12,8 +12,10 @@ use App\Service\ImageService;
 use App\Service\TypeService;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Serializer\SerializerInterface; 
- 
+use Symfony\Component\Serializer\SerializerInterface;
+
+use function PHPUnit\Framework\isEmpty;
+
 final class GameController extends AbstractController
 {
    private ImageService $imageService;
@@ -1256,7 +1258,7 @@ public function testToken(Request $request): Response
 
         $folder = $this->getParameter('images_directory') . '/cards';
         $oldImage = $assetsCards[$cardId]["image"] ?? null;
-        if ($oldImage) {
+        if (!isEmpty($oldImage)) {
             $oldPath = $folder . '/' . $oldImage;
             if ($filesystem->exists($oldPath)) {
                 $filesystem->remove($oldPath);
