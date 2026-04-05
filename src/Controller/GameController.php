@@ -1255,9 +1255,11 @@ public function testToken(Request $request): Response
         if (!isset($assetsCards[$cardId])) {
             return $this->json(['message' => 'Carte non trouvée.'], 404);
         }
+        
+        $oldImage = $assetsCards[$cardId]["image"] ?? null;
+        dd($assetsCards[$cardId]);
 
         $folder = $this->getParameter('images_directory') . '/cards';
-        $oldImage = $assetsCards[$cardId]["image"] ?? null;
         if (!isEmpty($oldImage)) {
             $oldPath = $folder . '/' . $oldImage;
             if ($filesystem->exists($oldPath)) {
