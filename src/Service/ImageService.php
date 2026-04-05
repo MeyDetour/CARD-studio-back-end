@@ -14,9 +14,15 @@ class ImageService
     }
     public function getImageUrl(string $imageName, string $folder, string $filter): string
     {
-        $path = '/images/'.$folder.'/'.$imageName;
+     $imageName = trim($imageName, '/');
+     
+    $path = 'images/'.$folder.'/'.$imageName; 
 
-        return $this->cacheManager->generateUrl($path, $filter);
+    try {
+        return $this->cacheManager->getBrowserPath($path, $filter);
+    } catch (\Exception $e) { 
+        return '/images/'.$folder.'/'.$imageName; 
+    }
     }
 
 }
