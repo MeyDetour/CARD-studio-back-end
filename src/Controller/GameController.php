@@ -1075,6 +1075,21 @@ public function testToken(Request $request): Response
         if ($averageNotes > 0 ){
                 $averageNotes = round($averageNotes/count($game->getNotes()) , 1) ;
         }
+ 
+        $cards = $game->getAssetsCard() ?? [];
+    
+        foreach ($cards as $id => $card) {
+            if (isset($card['image']) && $card['image']) {
+                $cards[$id]['image'] = $this->imageService->getImageUrl(
+                    $card['image'], 
+                    "game", 
+                    'game_image'
+                );
+            } else {
+                $cards[$id]['image'] = null;
+            }
+        }
+        
             
         return   [
         "id"=>$game->getId(), 
@@ -1101,7 +1116,7 @@ public function testToken(Request $request): Response
             "withValueEvent"=>$game->getEventWithValueEvents()
         ],
         "assets"=>[
-            "cards"=>$game->getAssetsCard(),
+            "cards"=>$cards,
             "gains"=>$game->getAssetsGain(),
             "roles"=>$game->getRoles(),
         ]
