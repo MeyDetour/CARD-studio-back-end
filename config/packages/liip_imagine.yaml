@@ -18,3 +18,7 @@ liip_imagine:
              quality: 80
              filters:
                  thumbnail: { size: [400,900], mode: outbound, allow_upscale: true }
+        gain_image:
+             quality: 80
+             filters:
+                 thumbnail: { size: [400,900], mode: outbound, allow_upscale: true }

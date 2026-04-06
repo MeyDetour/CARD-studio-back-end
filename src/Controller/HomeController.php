@@ -686,6 +686,33 @@ $routes = [
             'token' => false
         ]
     ],
+    'Gain' => [
+        [
+            'name' => 'Edit gain',
+            'route' => '/api/game/{id}/edit/gain/{gainId}',
+            'methode' => 'PUT',
+            'description' => 'Modifie un gain spécifique d\'un jeu.',
+            'body' => [
+                'id' => 'number',
+                'nom' => 'string',
+                'value' => 'mixed',
+                'value_numérique' => 'number',
+                'quantite' => 'number|null',
+                // autres champs modifiables selon la structure du gain
+            ],
+            'sendBack' => ['game' => 'object'],
+            'token' => true
+        ],
+        [
+            'name' => 'Upload gain image',
+            'route' => '/api/game/{id}/gain/{gainId}/uploadImage',
+            'methode' => 'POST',
+            'description' => 'Ajoute ou remplace l\'image d\'un gain.',
+            'body' => ['file' => 'image (NOT NULL)'],
+            'sendBack' => ['filename' => 'string', 'url' => 'string'],
+            'token' => true
+        ]
+    ],
     'Home' => [
         [
             'name' => 'Home page',
