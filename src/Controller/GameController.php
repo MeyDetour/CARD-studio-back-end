@@ -1218,7 +1218,7 @@ public function testToken(Request $request): Response
     }
     
      #[Route('/api/game/upload-image/{id}', name: 'app_image',methods: ['POST'])]
-    public function addGameImage(Game $game, Request $request, EntityManagerInterface $em, Filesystem $filesystem): Response
+    public function addGameImage(Game $game, Request $request,ImageService $imageService ,EntityManagerInterface $em, Filesystem $filesystem): Response
     {
  
 
@@ -1246,11 +1246,12 @@ public function testToken(Request $request): Response
         $em->flush();   
         return $this->json([
             'message' => 'Image ajoutée avec succès',
-            'filename' => $newFilename
+            'filename' => $newFilename, 
+            'url' => $imageService->getImageUrl($newFilename, "game", 'game_image')
         ]);
     }
       #[Route('/api/game/{id}/card/{cardId}/uploadImage', name: 'card_image',methods: ['POST'])]
-    public function addCardImage(Game $game, $cardId, Request $request, EntityManagerInterface $em, TranslatorInterface $translator,Filesystem $filesystem): Response
+    public function addCardImage(Game $game, $cardId, Request $request, ImageService $imageService, EntityManagerInterface $em, TranslatorInterface $translator,Filesystem $filesystem): Response
     { 
         $assetsCards = $game->getAssetsCard(); 
         if (!isset($assetsCards[$cardId])) {
@@ -1294,7 +1295,8 @@ public function testToken(Request $request): Response
         $em->flush();
             return $this->json([
                 'message' => 'Image ajoutée avec succès',
-                'filename' => $newFilename
+                'filename' => $newFilename,
+                'url' => $imageService->getImageUrl($newFilename, "card", 'card_image')
             ]);
     }   
     
