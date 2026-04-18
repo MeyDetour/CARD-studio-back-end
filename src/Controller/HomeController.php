@@ -673,6 +673,24 @@ $routes = [
                     'body' => ['file' => 'image (NOT NULL)'],
                     'sendBack' => ['filename' => 'string'],
                     'token' => true
+                ],
+                [
+                    'name' => 'Get cards',
+                    'route' => '/api/game/{gameId}/get/cards',
+                    'methode' => 'GET',
+                    'description' => 'Récupère les cartes d\'un jeu.',
+                    'body' => null,
+                    'sendBack' => ['array'],
+                    'token' => true
+                ],
+                [
+                    'name' => 'Restaure cards',
+                    'route' => '/api/game/{gameId}/restore/cards',
+                    'methode' => 'PUT',
+                    'description' => 'Restaure les cartes d\'un jeu.',
+                    'body' => null,
+                    'sendBack' => ['array'],
+                    'token' => true
                 ]
             ],
     'Note' => [

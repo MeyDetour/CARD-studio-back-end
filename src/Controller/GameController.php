@@ -1326,8 +1326,28 @@ public function testToken(Request $request): Response
         return $this->json( $this->getGameObject($game) ,200, [],['groups'=>"games"] );
         
     }
-      #[Route('api/game/{id}/restore/cards', name: 'restore_card')]
-    public function restaureCards(Game $game ,  Filesystem $filesystem, EntityManagerInterface $manager): Response
+      #[Route('api/game/{id}/get/cards', name: 'get_cards',methods: ['GET'])]
+    public function getCards(Game $game): Response
+    {  
+
+        $cards = $game->getAssetsCard() ?? [];
+    
+        foreach ($cards as $id => $card) {
+            if (isset($card['image']) && $card['image']) {
+                $cards[$id]['image'] = $this->imageService->getImageUrl(
+                    $card['image'], 
+                    "card", 
+                    'card_image'
+                );
+            } else {
+                $cards[$id]['image'] = null;
+            }
+        }
+        return $this->json( $cards ,200, [],['groups'=>"games"] );
+    }
+        
+    #[Route('api/game/{id}/restore/cards', name: 'restore_card',methods: ['PUT'])]
+    public function restoreCards(Game $game ,  Filesystem $filesystem, EntityManagerInterface $manager): Response
     {    
          
     if (json_last_error() !== JSON_ERROR_NONE) {
