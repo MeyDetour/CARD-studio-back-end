@@ -1327,7 +1327,7 @@ public function testToken(Request $request): Response
         
     }
       #[Route('api/game/{id}/restore/cards', name: 'restore_card')]
-    public function restaureCards(Game $game ,  $cardId,SerializerInterface $serializer ,Filesystem $filesystem, EntityManagerInterface $manager, Request $request , TypeService $typeService): Response
+    public function restaureCards(Game $game ,  Filesystem $filesystem, EntityManagerInterface $manager): Response
     {    
          
     if (json_last_error() !== JSON_ERROR_NONE) {
