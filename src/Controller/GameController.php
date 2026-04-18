@@ -988,13 +988,15 @@ public function testToken(Request $request): Response
 
             ]);
             $game->setEventWin([
-                "applyOnAllPlayers" => true,
+                "applyOnAllPlayers" => false,
                 "allElementOfBoucleMustSatisyCondition"=>false,
                 "manyPlayersCanBeWinner"=>true,
                 "displayPoints"=>[
-                    "activation"=>false
+                    "activation"=>false,
+                    "pointsToDisplayFor"=> "",
+                    "elementToDisplay"=>""
 
-                ]
+                ] 
 
             ]);
             $game->setEventLoose([]);
@@ -1322,6 +1324,74 @@ public function testToken(Request $request): Response
         $manager->persist($game);
         $manager->flush();
         return $this->json( $this->getGameObject($game) ,200, [],['groups'=>"games"] );
+        
+    }
+      #[Route('api/game/{id}/restore/cards', name: 'restore_card')]
+    public function restaureCards(Game $game ,  $cardId,SerializerInterface $serializer ,Filesystem $filesystem, EntityManagerInterface $manager, Request $request , TypeService $typeService): Response
+    {    
+         
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        return $this->json(['message' => 'Données JSON invalides'], 400);
+    }
+ 
+    try {
+        $folder = $this->getParameter('images_directory') . '/card';
+    } catch (\Exception $e) {
+        return $this->json(['message' => 'Configuration du dossier d\'images manquante'], 500);
+    }
+ 
+    $assetsCards = $game->getAssetsCard();
+ 
+    if (!is_array($assetsCards) || empty($assetsCards)) {
+        return $this->json(['message' => 'Aucune carte à restaurer pour ce jeu'], 200);
+    }
+
+    foreach ($assetsCards as $card) {
+        $oldImage = $card["image"] ?? null;
+ 
+        if (!empty($oldImage)) {
+            $oldPath = $folder . '/' . $oldImage;
+
+            try {
+                if ($filesystem->exists($oldPath)) {
+                    $filesystem->remove($oldPath);
+                }
+            } catch (\Exception $e) { 
+                continue; 
+            }
+        }
+    }
+
+    $cardsConfig = [];
+    $colors = [
+            'pique'   => range(1, 13),
+            'trefle' => range(14, 26),
+            'coeur'   => range(27, 39),
+            'carreau' => range(40, 52),
+        ];
+        foreach ($colors as $colorName => $range) {
+            foreach ($range as $index => $id) {
+                // La valeur de la carte va de 1 à 13 pour chaque couleur
+                $value = $index + 1; 
+
+                $cardsConfig[$id] = [
+                    'id' => $id,
+                    'value' => $value,
+                    'type' => "french_standard",
+                    'addedAttributs' => [
+                        'couleur' => $colorName
+                    ]
+                ];
+            }
+        }
+
+    $game->setAssetsCard($cardsConfig);
+
+    $manager->persist($game);
+    $manager->flush();
+    return $this->json( ["message"=>"ok"],200, [],['groups'=>"games"] );
+            
+      
         
     }
     #[Route('api/game/{id}/edit/gain/{gainId}', name: 'edit_gain')]
