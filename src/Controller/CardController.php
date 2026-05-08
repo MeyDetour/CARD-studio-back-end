@@ -76,16 +76,25 @@ public function uploadCardZip(
     $file = $request->files->get('file');
     if (!$file) {
         return $this->json(['message' => $translator->trans('file_not_found')], 400);
-    }
-
-    $zip = new \ZipArchive();
+    } 
+    if (!$file->isValid()) {
+    // C'est ici que tu auras la vraie réponse (ex: "The file is too large")
+    dd([
+        'error_message' => $file->getErrorMessage(),
+        'php_error_code' => $file->getError()
+    ]);
+} 
     $assetsCards = $game->getAssetsCard() ?? [];  
     $folder = $this->getParameter('images_directory') . '/card';
-if ($zip->open($file->getRealPath()) === TRUE) {
+ 
+
+    $zip = new \ZipArchive();
+$res = $zip->open($file->getRealPath()); 
+    if ($res) { 
+   
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $filename = $zip->getNameIndex($i);
-            $fileInfo = pathinfo($filename);
-
+            $fileInfo = pathinfo($filename); 
             // On ne traite que les images
             if (isset($fileInfo['extension']) && in_array(strtolower($fileInfo['extension']), ['jpg', 'jpeg', 'png', 'webp'])) {
                 
@@ -93,35 +102,59 @@ if ($zip->open($file->getRealPath()) === TRUE) {
                 $newName = uniqid() . '_' . $fileInfo['basename'];
                 
                 // On utilise l'ID (nom du fichier sans extension) pour trouver la carte
-                $cardId = $fileInfo['filename']; 
-
+                $cardId = uniqid(); // Par défaut, on génère un ID unique
                 // Si la carte existe dans ton tableau associatif
-                if (isset($assetsCards[$cardId])) {
-                    // Sauvegarde physique
-                    file_put_contents($folder . '/' . $newName, $imageContent);
-                    // Mise à jour de l'image pour cette clé précise
-                    $assetsCards[$cardId]['image'] = $newName;
+               
+                // Sauvegarde physique
+                if (!is_dir($folder)) {
+                    mkdir($folder, 0775, true);
                 }
+                file_put_contents($folder . '/' . $newName, $imageContent);
+                // Mise à jour de l'image pour cette clé précise
+                $assetsCards[$cardId] = [
+                    'id' => $cardId,
+                    'name'=>$fileInfo['basename'],
+                    'image' => $newName
+                ]; 
+             
             }
         }
         $zip->close();
     }
+ 
+        if (!$res) {
+            $errorMap = [
+                \ZipArchive::ER_EXISTS => "Le fichier existe déjà.",
+                \ZipArchive::ER_INCONS => "L'archive zip est inconsistante.",
+                \ZipArchive::ER_INVAL => "Argument invalide.",
+                \ZipArchive::ER_MEMORY => "Erreur de mémoire.",
+                \ZipArchive::ER_NOENT => "Le fichier n'existe pas.",
+                \ZipArchive::ER_NOZIP => "Ce n'est pas une archive zip valide.",
+                \ZipArchive::ER_OPEN => "Impossible d'ouvrir le fichier.",
+                \ZipArchive::ER_READ => "Erreur de lecture.",
+                \ZipArchive::ER_SEEK => "Erreur de positionnement."
+            ];
 
-    // Mettre à jour et sauvegarder
-    $game->setAssetsCard($assetsCards);
-    $em->persist($game);
-    $em->flush();
+            $message = $errorMap[$res] ?? "Erreur inconnue code : " . $res;
+            return $this->json(['message' => $message], 400);
+        }
 
-   
-return $this->json(
-    $game->getAssetsCard(), 
-    200, 
-    [], 
-    [
-        'groups' => "games",
-        'json_encode_options' => JSON_FORCE_OBJECT // <--- INDISPENSABLE
-    ]
-);    } 
+        // Mettre à jour et sauvegarder
+        $game->setAssetsCard($assetsCards);
+        $em->persist($game);
+        $em->flush();
+
+    
+        return $this->json(
+            $game->getAssetsCard(), 
+            200, 
+            [], 
+            [
+                'groups' => "games",
+                'json_encode_options' => JSON_FORCE_OBJECT // <--- INDISPENSABLE
+            ]
+        );    
+    } 
     
     #[Route('api/game/{id}/edit/card/{cardId}', name: 'edit_card')]
     public function editCard(Game $game ,  $cardId,SerializerInterface $serializer, EntityManagerInterface $manager, Request $request ): Response
