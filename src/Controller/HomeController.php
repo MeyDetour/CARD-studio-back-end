@@ -71,6 +71,7 @@ $routes = [
         ]
     ],
     'Game' => [
+   
         [
             'name' => 'Get all public games',
             'route' => '/games',
@@ -648,6 +649,17 @@ $routes = [
         ]
     ],
       'Carte' => [
+                     [
+                    'name' => 'Upload cards zip',
+                    'route' => '/api/game/{id}/cards/uploadZip',
+                    'methode' => 'POST',
+                    'description' => "Permet d'uploader un fichier zip contenant des images. Une carte est créée pour chaque image trouvée dans le zip.",
+                    'body' => [
+                        'file' => 'zip (NOT NULL)'
+                    ],
+                    'sendBack' => ['createdCards' => 'array', 'message' => 'string'],
+                    'token' => true
+                ],
                 [
                     'name' => 'Edit card',
                     'route' => '/api/game/{gameId}/edit/card/{cardId}',

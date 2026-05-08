@@ -10,18 +10,22 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\GameRepository;
 use App\Service\ImageService;
 use App\Service\TypeService;
+use App\Service\GameObjectService;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
+// use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function PHPUnit\Framework\isEmpty;
 
 final class GameController extends AbstractController
 {
-   private ImageService $imageService;
-  public  function __construct(ImageService $imageService){
+    private ImageService $imageService;
+    private GameObjectService $gameObjectService;
+    public function __construct(ImageService $imageService, GameObjectService $gameObjectService)
+    {
         $this->imageService = $imageService;
+        $this->gameObjectService = $gameObjectService;
     }
 
 #[Route('/api/test-token', name: 'app_test_token')]
@@ -41,7 +45,7 @@ public function testToken(Request $request): Response
         $games = $gameRepository->findBy(["isPublic" => true]);
         $gamesToSend = [];
         foreach($games as $game){ 
-            $gameToSend = $this->getGameObject($game);
+            $gameToSend = $this->gameObjectService->getGameObject($game, $this->imageService);
             unset($gameToSend["events"]);
             unset($gameToSend["assets"]);
             unset($gameToSend["playerGlobalValue"]);
@@ -887,7 +891,7 @@ public function testToken(Request $request): Response
             $gamesToSend = [];
       
         foreach($games as $game){ 
-            $gameToSend = $this->getGameObject($game);
+            $gameToSend = $this->gameObjectService->getGameObject($game, $this->imageService);
             unset($gameToSend["events"]);
             unset($gameToSend["assets"]);
             unset($gameToSend["playerGlobalValue"]);
@@ -1012,7 +1016,7 @@ public function testToken(Request $request): Response
             foreach ($colors as $colorName => $range) {
                 foreach ($range as $index => $id) {
                     // La valeur de la carte va de 1 à 13 pour chaque couleur
-                    $value = $index + 1; 
+                    $value = $index + 1;
 
                     $cardsConfig[$id] = [
                         'id' => $id,
@@ -1039,7 +1043,7 @@ public function testToken(Request $request): Response
     public function getGame(Game $game): Response
     {    
         if ($game->getCreator() == $this->getUser()){     
-             return $this->json( $this->getGameObject($game) ,200, [],['groups'=>"game"] );
+             return $this->json($this->gameObjectService->getGameObject($game, $this->imageService) ,200, [],['groups'=>"game"] );
         }
         return $this->json(  null ,200, [],['groups'=>"games"] );
     }   
@@ -1062,73 +1066,10 @@ public function testToken(Request $request): Response
     #[Route('game/{id}', name: 'get_game_public')]
     public function getGameWithId(Game $game): Response
     {    
-           return $this->json( $this->getGameObject($game) ,200, [],['groups'=>"game"] );
+           return $this->json($this->gameObjectService->getGameObject($game, $this->imageService) ,200, [],['groups'=>"game"] );
     }
  
 
-    private function getGameObject($game){
-        $averageNotes = 0; 
-        $notes = [];
-        foreach ($game->getNotes() as $note){
-            $averageNotes += $note->getRate();
-         $notes[] = [
-            "id"=>$note->getId(),
-            "rate"=>$note->getRate(),
-            "comment"=>$note->getDescription(),
-            "date"=>$note->getDate()->format("Y-m-d"),
-         ] ;
-        }
-        if ($averageNotes > 0 ){
-                $averageNotes = round($averageNotes/count($game->getNotes()) , 1) ;
-        }
- 
-        $cards = $game->getAssetsCard() ?? [];
-    
-        foreach ($cards as $id => $card) {
-            if (isset($card['image']) && $card['image']) {
-                $cards[$id]['image'] = $this->imageService->getImageUrl(
-                    $card['image'], 
-                    "card", 
-                    'card_image'
-                );
-            } else {
-                $cards[$id]['image'] = null;
-            }
-        }
-        
-            
-        return   [
-        "id"=>$game->getId(), 
-        "requestDate"=>new \DateTime(),
-        "name"=>$game->getName(),
-        "image"=>$game->getImage()? $this->imageService->getImageUrl($game->getImage(),    "game" ,'game_image') : null,
-        "isPublic"=>$game->isPublic(),
-        "description"=>$game->getDescription(),
-        "averageNotes"=>$averageNotes, 
-        "playerCount"=>$game->getPlayerCount(),
-        "notes"=>$notes,
-        "gameCount"=>$game->getGameCount(),
-        "types"=>$game->getTypes(), 
-        "editionHistory"=>$game->getEditionHistory(),
-        "globalValue"=>$game->getglobalValue(),
-        "globalValueStatic"=>$game->getglobalValueStatic() ?? [],
-        "playerGlobalValue"=>$game->getPlayerGlobalValue(),
-        "params"=>$game->getParams(),
-        "events"=>[
-            "demons"=>$game->getEventDemons(),
-            "events"=>$game->getEventEvents(),
-            "win"=>$game->getEventWin(),
-            "loose"=>$game->getEventLoose(),
-            "withValueEvent"=>$game->getEventWithValueEvents()
-        ],
-        "assets"=>[
-            "cards"=>$cards,
-            "gains"=>$game->getAssetsGain(),
-            "roles"=>$game->getRoles(),
-        ]
-        ] ;
-
-    }
      #[Route('api/game/edit/{id}', name: 'edit_game')]
     public function editGame(Game $game ,  SerializerInterface $serializer, EntityManagerInterface $manager, Request $request , TypeService $typeService): Response
     {    
@@ -1206,7 +1147,7 @@ public function testToken(Request $request): Response
         };
         $manager->persist($game);
         $manager->flush();
-        return $this->json( $this->getGameObject($game) ,200, [],['groups'=>"games"] );
+        return $this->json($this->gameObjectService->getGameObject($game, $this->imageService) ,200, [],['groups'=>"games"] );
         
     }
 
@@ -1253,250 +1194,5 @@ public function testToken(Request $request): Response
             'url' => $imageService->getImageUrl($newFilename, "game", 'game_image')
         ]);
     }
-      #[Route('/api/game/{id}/card/{cardId}/uploadImage', name: 'card_image',methods: ['POST'])]
-    public function addCardImage(Game $game, $cardId, Request $request, ImageService $imageService, EntityManagerInterface $em, TranslatorInterface $translator,Filesystem $filesystem): Response
-    { 
-        $assetsCards = $game->getAssetsCard(); 
-        if (!isset($assetsCards[$cardId])) {
-            return $this->json(['message' => 'Carte non trouvée.'], 404);
-        }
-        
-        $oldImage = $assetsCards[$cardId]["image"] ?? null;
-        
-        $folder = $this->getParameter('images_directory') . '/card';
-        if (!isEmpty($oldImage)) {
-            $oldPath = $folder . '/' . $oldImage;
-            if ($filesystem->exists($oldPath)) {
-                $filesystem->remove($oldPath);
-            }
-        }
-
-        $file = $request->files->get('file'); 
-        if (!$file) {
-            return $this->json(['message' => $translator->trans('file_not_found')], 400);
-        }
-
-        if (!$file->isValid()) {
-            // On récupère le message d'erreur de PHP/Symfony et on le traduit
-            $errorMessage = $translator->trans($file->getErrorMessage());
-            
-            return $this->json([
-                'message' => 'Erreur d\'upload : ' . $errorMessage,
-                'code' => $file->getError()
-            ], 400);
-        }
-
-        $newFilename = uniqid() . '.' . $file->guessExtension();
- 
-        $file->move($folder, $newFilename);
-        $assetsCards[$cardId]["image"] = $newFilename;
-         
-        $game->setAssetsCard($assetsCards);
-
-        // 6. Sauvegarde
-        $em->persist($game);
-        $em->flush();
-            return $this->json([
-                'message' => 'Image ajoutée avec succès',
-                'filename' => $newFilename,
-                'url' => $imageService->getImageUrl($newFilename, "card", 'card_image')
-            ]);
-    }   
     
-    #[Route('api/game/{id}/edit/card/{cardId}', name: 'edit_card')]
-    public function editCard(Game $game ,  $cardId,SerializerInterface $serializer, EntityManagerInterface $manager, Request $request , TypeService $typeService): Response
-    {    
-        $data = json_decode($request->getContent(), true);
-        if (!$data) {
-            return $this->json(['message' => 'Données JSON invalides'], 400);
-        }
-    
-        $assetsCards = $game->getAssetsCard() ?? []; 
-    
-        if (isset($assetsCards[$cardId])) { 
-            $assetsCards[$cardId] = array_merge($assetsCards[$cardId], $data);
-        } else { 
-            $data['id'] = $cardId; 
-            $assetsCards[$cardId] = $data;
-        }
-        $game->setAssetsCard($assetsCards); 
- 
-        $manager->getUnitOfWork()->computeChangeSets();  
-        $manager->persist($game);
-        $manager->flush();
-        return $this->json( $this->getGameObject($game) ,200, [],['groups'=>"games"] );
-        
-    }
-      #[Route('api/game/{id}/get/cards', name: 'get_cards',methods: ['GET'])]
-    public function getCards(Game $game): Response
-    {  
-
-        $cards = $game->getAssetsCard() ?? [];
-    
-        foreach ($cards as $id => $card) {
-            if (isset($card['image']) && $card['image']) {
-                $cards[$id]['image'] = $this->imageService->getImageUrl(
-                    $card['image'], 
-                    "card", 
-                    'card_image'
-                );
-            } else {
-                $cards[$id]['image'] = null;
-            }
-        }
-        return $this->json( $cards ,200, [],['groups'=>"games"] );
-    }
-        
-    #[Route('api/game/{id}/restore/cards', name: 'restore_card',methods: ['PUT'])]
-    public function restoreCards(Game $game ,  Filesystem $filesystem, EntityManagerInterface $manager): Response
-    {    
-         
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        return $this->json(['message' => 'Données JSON invalides'], 400);
-    }
- 
-    try {
-        $folder = $this->getParameter('images_directory') . '/card';
-    } catch (\Exception $e) {
-        return $this->json(['message' => 'Configuration du dossier d\'images manquante'], 500);
-    }
- 
-    $assetsCards = $game->getAssetsCard();
- 
-    if (!is_array($assetsCards) || empty($assetsCards)) {
-        return $this->json(['message' => 'Aucune carte à restaurer pour ce jeu'], 200);
-    }
-
-    foreach ($assetsCards as $card) {
-        $oldImage = $card["image"] ?? null;
- 
-        if (!empty($oldImage)) {
-            $oldPath = $folder . '/' . $oldImage;
-
-            try {
-                if ($filesystem->exists($oldPath)) {
-                    $filesystem->remove($oldPath);
-                }
-            } catch (\Exception $e) { 
-                continue; 
-            }
-        }
-    }
-
-    $cardsConfig = [];
-    $colors = [
-            'pique'   => range(1, 13),
-            'trefle' => range(14, 26),
-            'coeur'   => range(27, 39),
-            'carreau' => range(40, 52),
-        ];
-        foreach ($colors as $colorName => $range) {
-            foreach ($range as $index => $id) {
-                // La valeur de la carte va de 1 à 13 pour chaque couleur
-                $value = $index + 1; 
-
-                $cardsConfig[$id] = [
-                    'id' => $id,
-                    'name' => $value . " de " . $colorName,
-                    'value' => $value,
-                    'type' => "french_standard",
-                    'addedAttributs' => [
-                        'couleur' => $colorName
-                    ]
-                ];
-            }
-        }
-
-    $game->setAssetsCard($cardsConfig);
-
-    $manager->persist($game);
-    $manager->flush();
-    return $this->json( ["message"=>"ok"],200, [],['groups'=>"games"] );
-            
-      
-        
-    }
-    #[Route('api/game/{id}/edit/gain/{gainId}', name: 'edit_gain')]
-    public function editGain(Game $game ,  $gainId,SerializerInterface $serializer, EntityManagerInterface $manager, Request $request , TypeService $typeService): Response
-    {    
-        $data = json_decode($request->getContent(), true);
-        if (!$data) {
-            return $this->json(['message' => 'Données JSON invalides'], 400);
-        }
-    
-        $assetsGains = $game->getAssetsGain() ?? []; 
-    
-       $assetsGains = array_filter($assetsGains, function($gain) use ($gainId) {
-       return isset($gain['id']) && $gain['id'] != $gainId;
-       });
-        $data['id'] = $gainId; 
-        $assetsGains[] = $data;
-
-        $assetsGains = array_values($assetsGains);
-        $game->setAssetsGain([]); 
-        $game->setAssetsGain($assetsGains);
- 
-        $manager->getUnitOfWork()->computeChangeSets();  
-        $manager->persist($game);
-        $manager->flush();
-        return $this->json( $this->getGameObject($game) ,200, [],['groups'=>"games"] );
-        
-    }
-        #[Route('/api/game/{id}/gain/{gainId}/uploadImage', name: 'gain_image',methods: ['POST'])]
-    public function addGainImage(Game $game, $gainId, Request $request, ImageService $imageService, EntityManagerInterface $em, TranslatorInterface $translator,Filesystem $filesystem): Response
-    { 
-        
-        $assetsGains = $game->getAssetsGain() ?? []; 
-        $targetIndex = null;
- 
-        foreach ($assetsGains as $index => $gain) {
-            if (isset($gain['id']) && $gain['id'] == $gainId) {
-                $targetIndex = $index;
-                break;
-            }
-        }
-
-        if ($targetIndex === null) {
-            return $this->json(['message' => 'Gain non trouvé.'], 404);
-        }
- 
-        $oldImage = $assetsGains[$targetIndex]["image"] ?? null;
-        $folder = $this->getParameter('images_directory') . '/gain';
-        
-        if (!empty($oldImage)) { 
-            $oldPath = $folder . '/' . $oldImage;
-            if ($filesystem->exists($oldPath)) {
-                $filesystem->remove($oldPath);
-            }
-        }
- 
-        $file = $request->files->get('file'); 
-        if (!$file) {
-            return $this->json(['message' => $translator->trans('file_not_found')], 400);
-        }
-
-        if (!$file->isValid()) {
-            return $this->json([
-                'message' => 'Erreur d\'upload : ' . $translator->trans($file->getErrorMessage()),
-                'code' => $file->getError()
-            ], 400);
-        }
- 
-        $newFilename = uniqid() . '.' . $file->guessExtension();
-        $file->move($folder, $newFilename);
- 
-        $assetsGains[$targetIndex]["image"] = $newFilename;
-         
-        $game->setAssetsGain($assetsGains);
-
-        $em->persist($game);
-        $em->flush();
-        return $this->json([
-            'message' => 'Image ajoutée avec succès',
-            'filename' => $newFilename,
-            'url' => $imageService->getImageUrl($newFilename, "gain", 'gain_image')
-        ]);
-    }   
-    
-
 }
