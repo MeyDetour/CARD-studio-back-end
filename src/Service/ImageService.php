@@ -13,15 +13,9 @@ class ImageService
     }
     public function getImageUrl(string $imageName, string $folder, string $filter): string
     {
-     $imageName = trim($imageName, '/');
-     
-    $path = 'images/'.$folder.'/'.$imageName; 
-
-    try {
-        return $this->cacheManager->generateUrl($path, $filter);
-    } catch (\Exception $e) { 
-        return '/images/'.$folder.'/'.$imageName; 
-    }
+        $imageName = trim($imageName, '/');
+        // Retourne toujours l'URL brute, sans passer par LiipImagine
+        return '/images/' . $folder . '/' . $imageName;
     }
 
 }
