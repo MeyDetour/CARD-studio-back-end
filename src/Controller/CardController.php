@@ -113,7 +113,8 @@ final class CardController extends AbstractController
                 // Mise à jour de l'image pour cette clé précise
                 $newAssetsCards[$cardId] = [
                     'id' => $cardId,
-                    'image' => $newName
+                    'image' => $newName,
+                    'name' => $filename
                 ]; 
              
             }
