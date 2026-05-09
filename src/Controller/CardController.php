@@ -85,7 +85,7 @@ final class CardController extends AbstractController
        return $this->json(['message' =>  $file->getErrorMessage()], 400);
     }  
     $newAssetsCards = [];
-    $folder = $this->getParameter('images_directory') . '/card';
+    $folder = $this->getParameter('images_directory') . '/cards';
  
 
     $zip = new \ZipArchive();
