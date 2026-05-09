@@ -66,29 +66,28 @@ final class CardController extends AbstractController
             ]);
     }   
     #[Route("api/game/{id}/cards/uploadZip", name: 'card_zip', methods: ['POST'])]
-public function uploadCardZip(
-    Game $game, 
-    Request $request, 
-    ImageService $imageService, 
-    EntityManagerInterface $em, 
-    TranslatorInterface $translator
-): Response {
+    public function uploadCardZip(
+        Game $game, 
+        Request $request, 
+        ImageService $imageService, 
+        EntityManagerInterface $em, 
+        TranslatorInterface $translator
+    ): Response {
     $file = $request->files->get('file');
     if (!$file) {
         return $this->json(['message' => $translator->trans('file_not_found')], 400);
     } 
+    dd(php_ini_loaded_file(), ini_get('upload_max_filesize'));
     if (!$file->isValid()) {
-    // C'est ici que tu auras la vraie réponse (ex: "The file is too large")
-   
-
-           return $this->json(['message' =>  $file->getErrorMessage()], 400);
-} 
+        // C'est ici que tu auras la vraie réponse (ex: "The file is too large")
+       return $this->json(['message' =>  $file->getErrorMessage()], 400);
+    } 
     $assetsCards = $game->getAssetsCard() ?? [];  
     $folder = $this->getParameter('images_directory') . '/card';
  
 
     $zip = new \ZipArchive();
-$res = $zip->open($file->getRealPath()); 
+    $res = $zip->open($file->getRealPath()); 
     if ($res) { 
    
         for ($i = 0; $i < $zip->numFiles; $i++) {
