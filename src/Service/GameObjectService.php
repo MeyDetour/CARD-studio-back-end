@@ -66,7 +66,7 @@ class GameObjectService
     
         foreach ($cards as $id => $card) {
             if (isset($card['image']) && $card['image']) {
-                $cards[$id]['image'] = $imageService->getImageUrl(
+                $cards[$id]['url'] = $imageService->getImageUrl(
                     $card['image'], 
                     "card", 
                     'card_image'
