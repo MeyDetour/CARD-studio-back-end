@@ -26,20 +26,7 @@ class GameObjectService
                 $averageNotes = round($averageNotes/count($game->getNotes()) , 1) ;
         }
  
-        $cards = $game->getAssetsCard() ?? [];
-    
-        foreach ($cards as $id => $card) {
-            if (isset($card['image']) && $card['image']) {
-                $cards[$id]['image'] = $imageService->getImageUrl(
-                    $card['image'], 
-                    "card", 
-                    'card_image'
-                );
-            } else {
-                $cards[$id]['image'] = null;
-            }
-        }
-        
+        $cards = $this->getAssetsCards($game->getAssetsCard(), $imageService);
             
         return   [
         "id"=>$game->getId(), 
@@ -71,5 +58,23 @@ class GameObjectService
             "roles"=>$game->getRoles(),
         ]
         ] ;
+    }
+
+    public function getAssetsCards(array $cardsAssets, ImageService $imageService): array{
+    
+        $cards = $cardsAssets ?? [];
+    
+        foreach ($cards as $id => $card) {
+            if (isset($card['image']) && $card['image']) {
+                $cards[$id]['image'] = $imageService->getImageUrl(
+                    $card['image'], 
+                    "card", 
+                    'card_image'
+                );
+            } else {
+                $cards[$id]['image'] = null;
+            }
+        }
+        return $cards;
     }
 }

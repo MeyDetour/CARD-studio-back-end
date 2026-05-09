@@ -71,6 +71,7 @@ final class CardController extends AbstractController
         Request $request, 
         ImageService $imageService, 
         EntityManagerInterface $em, 
+        GameObjectService $gameObjectService,
         TranslatorInterface $translator
     ): Response {
     $file = $request->files->get('file');
@@ -144,7 +145,7 @@ final class CardController extends AbstractController
 
     
         return $this->json(
-            $game->getAssetsCard(), 
+            $gameObjectService->getAssetsCards($game->getAssetsCard(), $imageService), 
             200, 
             [], 
             [
