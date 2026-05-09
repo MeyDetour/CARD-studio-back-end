@@ -1099,50 +1099,50 @@ public function testToken(Request $request): Response
         if ($gameEdited->getDescription()){
         $game->setDescription($gameEdited->getDescription());
         };
-        if ($gameEdited->getTypes()){
+        if ($gameEdited->getTypes() != null){
         $game->setTypes($gameEdited->getTypes());
         };
         if ($gameEdited->isPublic() !== null){
         $game->setIsPublic($gameEdited->isPublic());
         }
-        if( $gameEdited->getPlayerGlobalValue()){
+        if( $gameEdited->getPlayerGlobalValue() != null){
         $game->setPlayerGlobalValue($gameEdited->getPlayerGlobalValue());
         };
-        if( $gameEdited->getglobalValueStatic()){
+        if( $gameEdited->getglobalValueStatic() != null){
         $game->setglobalValueStatic($gameEdited->getglobalValueStatic());
         };
-        if( $gameEdited->getEditionHistory()){
+        if( $gameEdited->getEditionHistory() != null){
         $game->setEditionHistory($gameEdited->getEditionHistory());
         };
-        if ( $gameEdited->getglobalValue()){
+        if ( $gameEdited->getglobalValue() != null){
         $game->setglobalValue($gameEdited->getglobalValue());
         };
-        if ( $gameEdited->getParams()){
+        if ( $gameEdited->getParams() != null){
         $game->setParams($gameEdited->getParams());
         };
        
-        if( $gameEdited->getEventEvents()){
+        if( $gameEdited->getEventEvents() != null   ){
         $game->setEventEvents($data["EventEvents"]);
         };
-        if ( $gameEdited->getEventDemons()){
+        if ( $gameEdited->getEventDemons() != null){
         $game->setEventDemons($data["EventDemons"]);
         };
-        if ( $gameEdited->getEventWin()){
+        if ( $gameEdited->getEventWin() != null){
         $game->setEventWin($data["EventWin"]);
         };
-        if ( $gameEdited->getEventLoose()){
+        if ( $gameEdited->getEventLoose() != null){
         $game->setEventLoose($data["EventLoose"]);
         };
-        if( $gameEdited->getEventWithValueEvents()){
+        if( $gameEdited->getEventWithValueEvents() != null){
         $game->setEventWithValueEvents($data["EventWithValueEvents"]);
         };
-        if( $gameEdited->getAssetsCard()){
+        if( $gameEdited->getAssetsCard() != null){
         $game->setAssetsCard($data["assetsCard"]);
         };
-        if( $gameEdited->getAssetsGain()){
+        if( $gameEdited->getAssetsGain() != null){
         $game->setAssetsGain($data["assetsGain"]);
         };
-        if( $gameEdited->getRoles()){
+        if( $gameEdited->getRoles() != null){
         $game->setRoles($data["roles"]);
         };
         $manager->persist($game);
