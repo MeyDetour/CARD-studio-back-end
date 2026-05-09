@@ -1,15 +1,18 @@
 <?php
 
 namespace App\Service; 
+use Symfony\Component\Filesystem\Filesystem;
 
 class ImageService
 { 
 
     private string $imageDomain;
+    private Filesystem $filesystem;
 
-    public function __construct(string $imageDomain)
+    public function __construct(string $imageDomain, Filesystem $filesystem)
     {
         $this->imageDomain = rtrim($imageDomain, '/');
+        $this->filesystem = $filesystem;
     }
     public function getImageUrl(string $imageName, string $folder, string $filter): string
     {
@@ -17,6 +20,16 @@ class ImageService
         return $this->imageDomain . '/images/' . $folder . '/' . $imageName;
     }
 
+public function deleteImage(string $fullPath): void
+    {
+        // On récupère le chemin complet (assurez-vous d'avoir le paramètre images_directory)
+      
+
+        if ($this->filesystem->exists($fullPath)) {
+            $this->filesystem->remove($fullPath);
+        }
+    }
+ 
 }
 
 

@@ -1071,7 +1071,7 @@ public function testToken(Request $request): Response
  
 
      #[Route('api/game/edit/{id}', name: 'edit_game')]
-    public function editGame(Game $game ,  SerializerInterface $serializer, EntityManagerInterface $manager, Request $request , TypeService $typeService): Response
+    public function editGame(Game $game ,  SerializerInterface $serializer, EntityManagerInterface $manager, Request $request , TypeService $typeService,Filesystem $filesystem,ImageService $imageService): Response
     {    
      
         $gameEdited = $serializer->deserialize($request->getContent(), Game::class, 'json');
@@ -1136,9 +1136,25 @@ public function testToken(Request $request): Response
         if( $gameEdited->getEventWithValueEvents() != null){
         $game->setEventWithValueEvents($data["EventWithValueEvents"]);
         };
-        if( $gameEdited->getAssetsCard() != null){
-        $game->setAssetsCard($data["assetsCard"]);
-        };
+        $currentCards = $game->getAssetsCard() ?? []; 
+        // new cards representent les nouvelles données (incluant aussi les données prééxistantes)
+        $newCards = $data["assetsCard"] ?? [];
+
+        if ($newCards !== null) {
+            foreach ($currentCards as $id => $cardData) {
+                        $oldImage = $cardData['image'] ?? null;
+                        $isCardRemoved = !isset($newCards[$id]);
+                        $isImageChanged = isset($newCards[$id]) && ($newCards[$id]['image'] ?? null) !== $oldImage;
+
+                        if ($oldImage && ($isCardRemoved || $isImageChanged)) {
+                            $oldPath = $this->getParameter('images_directory') . '/cards/' . $oldImage;
+                            $imageService->deleteImage($oldPath);
+                        }
+                    }
+                
+                // 3. On applique les nouvelles cartes
+                $game->setAssetsCard($newCards);
+        }
         if( $gameEdited->getAssetsGain() != null){
         $game->setAssetsGain($data["assetsGain"]);
         };

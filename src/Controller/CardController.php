@@ -27,7 +27,7 @@ final class CardController extends AbstractController
         
         $oldImage = $assetsCards[$cardId]["image"] ?? null;
         
-        $folder = $this->getParameter('images_directory') . '/card';
+        $folder = $this->getParameter('images_directory') . '/cards';
         if (!empty($oldImage)) {
             $oldPath = $folder . '/' . $oldImage;
             if ($filesystem->exists($oldPath)) {
@@ -209,7 +209,7 @@ final class CardController extends AbstractController
     }
  
     try {
-        $folder = $this->getParameter('images_directory') . '/card';
+        $folder = $this->getParameter('images_directory') . '/cards';
     } catch (\Exception $e) {
         return $this->json(['message' => 'Configuration du dossier d\'images manquante'], 500);
     }

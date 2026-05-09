@@ -76,5 +76,5 @@ class GameObjectService
             }
         }
         return $cards;
-    }
+    } 
 }
