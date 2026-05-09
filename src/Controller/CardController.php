@@ -79,10 +79,9 @@ public function uploadCardZip(
     } 
     if (!$file->isValid()) {
     // C'est ici que tu auras la vraie réponse (ex: "The file is too large")
-    dd([
-        'error_message' => $file->getErrorMessage(),
-        'php_error_code' => $file->getError()
-    ]);
+   
+
+           return $this->json(['message' =>  $file->getErrorMessage()], 400);
 } 
     $assetsCards = $game->getAssetsCard() ?? [];  
     $folder = $this->getParameter('images_directory') . '/card';
