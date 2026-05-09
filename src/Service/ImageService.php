@@ -5,7 +5,7 @@ namespace App\Service;
 class ImageService
 { 
 
-    private $imageDomain;
+    private string $imageDomain;
 
     public function __construct(string $imageDomain)
     {
