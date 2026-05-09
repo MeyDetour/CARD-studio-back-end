@@ -146,7 +146,7 @@ final class CardController extends AbstractController
 
     
         return $this->json(
-            $newAssetsCards, 
+          $gameObjectService->getAssetsCards($newAssetsCards,$imageService) , 
             200, 
             [],
             [
