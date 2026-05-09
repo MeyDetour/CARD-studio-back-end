@@ -114,7 +114,8 @@ final class CardController extends AbstractController
                 $newAssetsCards[$cardId] = [
                     'id' => $cardId,
                     'image' => $newName,
-                    'name' => $filename
+                    'name' => $filename,
+                    "type" => "custom",
                 ]; 
              
             }
