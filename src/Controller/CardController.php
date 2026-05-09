@@ -12,6 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Entity\Game;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Service\ImageService;
+use App\Service\GameObjectService;
 use Doctrine\ORM\EntityManagerInterface;
 
 final class CardController extends AbstractController
