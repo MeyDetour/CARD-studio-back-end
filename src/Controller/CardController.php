@@ -77,7 +77,7 @@ final class CardController extends AbstractController
     if (!$file) {
         return $this->json(['message' => $translator->trans('file_not_found')], 400);
     } 
-    dd(php_ini_loaded_file(), ini_get('upload_max_filesize'));
+    //dd(php_ini_loaded_file(), ini_get('upload_max_filesize'));
     if (!$file->isValid()) {
         // C'est ici que tu auras la vraie réponse (ex: "The file is too large")
        return $this->json(['message' =>  $file->getErrorMessage()], 400);
