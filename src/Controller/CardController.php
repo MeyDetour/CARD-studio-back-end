@@ -83,8 +83,8 @@ final class CardController extends AbstractController
     if (!$file->isValid()) {
         // C'est ici que tu auras la vraie réponse (ex: "The file is too large")
        return $this->json(['message' =>  $file->getErrorMessage()], 400);
-    } 
-    $assetsCards = $game->getAssetsCard() ?? [];  
+    }  
+    $newAssetsCards = [];
     $folder = $this->getParameter('images_directory') . '/card';
  
 
@@ -111,7 +111,7 @@ final class CardController extends AbstractController
                 }
                 file_put_contents($folder . '/' . $newName, $imageContent);
                 // Mise à jour de l'image pour cette clé précise
-                $assetsCards[$cardId] = [
+                $newAssetsCards[$cardId] = [
                     'id' => $cardId,
                     'name'=>$fileInfo['basename'],
                     'image' => $newName
@@ -140,15 +140,15 @@ final class CardController extends AbstractController
         }
 
         // Mettre à jour et sauvegarder
-        $game->setAssetsCard($assetsCards);
+        $game->setAssetsCard([$game->getAssetsCard(), $newAssetsCards]);
         $em->persist($game);
         $em->flush();
 
     
         return $this->json(
-            $gameObjectService->getAssetsCards($game->getAssetsCard(), $imageService), 
+            $newAssetsCards, 
             200, 
-            [], 
+            [],
             [
                 'groups' => "games",
                 'json_encode_options' => JSON_FORCE_OBJECT // <--- INDISPENSABLE
