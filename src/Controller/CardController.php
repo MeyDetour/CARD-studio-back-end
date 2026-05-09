@@ -141,12 +141,12 @@ final class CardController extends AbstractController
 
         // Mettre à jour et sauvegarder
         $game->setAssetsCard([$game->getAssetsCard(), $newAssetsCards]);
-        $em->persist($game);
+        $em->persist($game); 
         $em->flush();
 
     
         return $this->json(
-          $gameObjectService->getAssetsCards($newAssetsCards,$imageService) , 
+            $gameObjectService->getAssetsCards($newAssetsCards,$imageService) , 
             200, 
             [],
             [
