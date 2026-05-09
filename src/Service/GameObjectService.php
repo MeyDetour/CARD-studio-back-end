@@ -68,7 +68,7 @@ class GameObjectService
             if (isset($card['image']) && $card['image']) {
                 $cards[$id]['url'] = $imageService->getImageUrl(
                     $card['image'], 
-                    "card", 
+                    "cards", 
                     'card_image'
                 );
             } else {
