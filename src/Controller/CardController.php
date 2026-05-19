@@ -18,7 +18,7 @@ use Doctrine\ORM\EntityManagerInterface;
 final class CardController extends AbstractController
 {
     #[Route('/api/game/{id}/card/{cardId}/uploadImage', name: 'card_image',methods: ['POST'])]
-    public function addCardImage(Game $game, $cardId, Request $request, ImageService $imageService, EntityManagerInterface $em, TranslatorInterface $translator, Filesystem $filesystem): Response
+    public function addCardImage(Game $game, $cardId, Request $request,ImageService $imageService ,GameObjectService $gameObjectService, EntityManagerInterface $em, TranslatorInterface $translator, Filesystem $filesystem): Response
     { 
         $assetsCards = $game->getAssetsCard(); 
         if (!isset($assetsCards[$cardId])) {
@@ -53,18 +53,14 @@ final class CardController extends AbstractController
         $newFilename = uniqid() . '.' . $file->guessExtension();
  
         $file->move($folder, $newFilename);
-        $assetsCards[$cardId]["image"] = $newFilename;
+        $assetsCards[$cardId]["image"] = $newFilename; 
          
         $game->setAssetsCard($assetsCards);
 
         // 6. Sauvegarde
         $em->persist($game);
         $em->flush();
-            return $this->json([
-                'message' => 'Image ajoutée avec succès',
-                'filename' => $newFilename,
-                'url' => $imageService->getImageUrl($newFilename, "card", 'card_image')
-            ]);
+            return $this->json($gameObjectService->getAssetsCards([ $assetsCards[$cardId]],$imageService)[0] , 200, [], ['groups' => "games"] );
     }   
     #[Route("api/game/{id}/cards/uploadZip", name: 'card_zip', methods: ['POST'])]
     public function uploadCardZip(

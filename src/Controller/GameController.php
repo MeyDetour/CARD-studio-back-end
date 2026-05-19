@@ -959,24 +959,36 @@ public function testToken(Request $request): Response
                     'max' => null,
                     'sens'=> "incrementation", // or decrementation
                     'startNumber'=>0
-                ],
-                'cards' => [
-                    'activeHandDeck' => true,
-                    'activPersonalHandDeck' => true,
-                    'activPersonalHandDiscard' => true,
-                    'activeDiscardDeck' => false,
-                    'discard' => [
-                        'quantity' => ['min' => null, 'max' => null],
-                    ],
-                    'pickOnDeck' => [
-                        'quantity' => ['min' => null, 'max' => null],
-                    ],
-                    'activeCardAsGain' => true,
-                    'handDeck' => [
-                        'activation' => true,
-                        'visibility' => "nobody",
-                    ],
-                    'cardBoard' => [],
+                ], 
+                'cards' => [  "activeHandDeck"=>true,
+                                "activPersonalHandDeck"=> true,
+                                "activPersonalHandDiscard"=> true,
+                                "activeDiscardDeck"=> false,
+                                "discard"=> [
+                                    "quantity"=> [
+                                        "min"=> null,
+                                        "max"=> null
+                                    ],
+                                    "activation"=> true
+                                ],
+                                "pickOnDeck"=> [
+                                    "quantity"=> [
+                                        "min"=> null,
+                                        "max"=> null
+                                    ]
+                                ],
+                                "activeCardAsGain"=> true,
+                                "handDeck"=> [
+                                    "activation"=> true,
+                                    "visibility"=> "nobody"
+                                ],
+                                "cardBoard"=> [],
+                                "hand"=> [
+                                    "activation"=> true
+                                ],
+                                "deck"=> [
+                                    "activation"=> true
+                                ]
                 ],
                 'roles'=>[
                     "activation" => true,
