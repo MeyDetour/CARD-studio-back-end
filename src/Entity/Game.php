@@ -417,19 +417,6 @@ class Game
 
         return $this;
     }
-
-    public function getEventTriggers(): ?array
-    {
-        return $this->eventTriggers;
-    }
-
-    public function setEventTriggers(?array $eventTriggers): static
-    {
-        $this->eventTriggers = $eventTriggers;
-
-        return $this;
-    }
  
-
  
 }
