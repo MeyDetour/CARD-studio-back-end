@@ -45,8 +45,8 @@ class GameObjectService
         "globalValueStatic"=>$game->getglobalValueStatic() ?? [],
         "playerGlobalValue"=>$game->getPlayerGlobalValue(),
         "params"=>$game->getParams(),
-        "events"=>[
-            "demons"=>$game->getEventDemons(),
+        "events"=>[ 
+            "trigger"=>$game->getEventTriggers(),
             "events"=>$game->getEventEvents(),
             "win"=>$game->getEventWin(),
             "loose"=>$game->getEventLoose(),

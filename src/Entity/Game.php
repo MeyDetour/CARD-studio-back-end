@@ -109,7 +109,10 @@ class Game
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(["game","games"])]
-    private ?string $image = null; 
+    private ?string $image = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?array $eventTriggers = null; 
 
  
 
@@ -248,12 +251,12 @@ class Game
         return $this;
     }
 
-    public function getEventDemons(): array
+    public function getEventTriggers(): array
     {
         return $this->EventDemons;
     }
 
-    public function setEventDemons(array $EventDemons): static
+    public function setEventTriggers(array $EventDemons): static
     {
         $this->EventDemons = $EventDemons;
 
@@ -411,6 +414,18 @@ class Game
     public function setImage(?string $image): static
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    public function getEventTriggers(): ?array
+    {
+        return $this->eventTriggers;
+    }
+
+    public function setEventTriggers(?array $eventTriggers): static
+    {
+        $this->eventTriggers = $eventTriggers;
 
         return $this;
     }

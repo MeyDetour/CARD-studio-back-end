@@ -238,7 +238,7 @@ public function testToken(Request $request): Response
             ]);
             $game->setEventWin([]);
             $game->setEventLoose([]);
-            $game->setEventDemons(
+            $game->setEventTriggers(
                 [ 
                 // La partie se lance après que tous les démons se soient activés si etat != start
                 [
@@ -999,7 +999,7 @@ public function testToken(Request $request): Response
                 ]
             ]);
 
-            $game->setEventDemons([]);
+            $game->setEventTriggers([]);
             $game->setEventEvents([
 
             ]);
@@ -1136,8 +1136,8 @@ public function testToken(Request $request): Response
         if( $gameEdited->getEventEvents() != null   ){
         $game->setEventEvents($data["EventEvents"]);
         };
-        if ( $gameEdited->getEventDemons() != null){
-        $game->setEventDemons($data["EventDemons"]);
+        if ( $gameEdited->getEventTriggers() != null){
+        $game->setEventTriggers($data["EventTriggers"]);
         };
         if ( $gameEdited->getEventWin() != null){
         $game->setEventWin($data["EventWin"]);

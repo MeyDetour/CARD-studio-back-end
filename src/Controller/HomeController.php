@@ -401,7 +401,7 @@ $routes = [
                     ]
                 ],
                 'events' => [
-                    'demons' => [
+                    'triggers' => [
                         [
                             'id' => 'number',
                             'condition' => 'string',
@@ -559,7 +559,7 @@ $routes = [
                     ]
                 ],
                 'events' => [
-                    'demons' => [
+                    'triggers' => [
                         [
                             'id' => 'number',
                             'condition' => 'string',
@@ -615,7 +615,7 @@ $routes = [
             'name' => 'Edit game',
             'route' => '/api/game/edit/{id}',
             'methode' => 'PUT',
-            'description' => 'Modifie un jeu existant. Les champs modifiables sont : name, description, types, isPublic, playerGlobalValue, globalValueStatic, editionHistory, globalValue, params, EventEvents, EventDemons, EventWin, EventLoose, EventWithValueEvents, assetsCard, assetsGain, roles.',
+            'description' => 'Modifie un jeu existant. Les champs modifiables sont : name, description, types, isPublic, playerGlobalValue, globalValueStatic, editionHistory, globalValue, params, EventEvents, EventTriggers, EventWin, EventLoose, EventWithValueEvents, assetsCard, assetsGain, roles.',
             'body' => [
                 'name' => 'string (NOT NULL)',
                 'description' => 'string (NOT NULL)',
@@ -627,7 +627,7 @@ $routes = [
                 'globalValue' => 'array (optionnel)',
                 'params' => 'array (optionnel)',
                 'EventEvents' => 'array (optionnel)',
-                'EventDemons' => 'array (optionnel)',
+                'EventTriggers' => 'array (optionnel)',
                 'EventWin' => 'array (optionnel)',
                 'EventLoose' => 'array (optionnel)',
                 'EventWithValueEvents' => 'array (optionnel)',
