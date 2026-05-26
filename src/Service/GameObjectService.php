@@ -46,7 +46,7 @@ class GameObjectService
         "playerGlobalValue"=>$game->getPlayerGlobalValue(),
         "params"=>$game->getParams(),
         "events"=>[ 
-            "triggesr"=>$game->getEventTriggers(),
+            "triggers"=>$game->getEventTriggers(),
             "events"=>$game->getEventEvents(),
             "win"=>$game->getEventWin(),
             "loose"=>$game->getEventLoose(),
