@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\DeckRepository;
 use Doctrine\DBAL\Types\Types;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DeckRepository::class)]
@@ -12,25 +13,32 @@ class Deck
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['deck'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['deck'])]   
     private ?string $authorName = null;
 
     #[ORM\Column]
+    #[Groups(['deck'])]
     private ?bool $isPublished = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['deck'])]
     private ?array $cards = null;
 
     #[ORM\Column]
+    #[Groups(['deck'])] 
     private array $params = [];
 
     #[ORM\ManyToOne(inversedBy: 'decks')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['deck'])]
     private ?User $owner = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['deck'])]
     private ?string $name = null;
 
     public function getId(): ?int

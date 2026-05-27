@@ -26,7 +26,7 @@ class GameObjectService
                 $averageNotes = round($averageNotes/count($game->getNotes()) , 1) ;
         }
  
-        $cards = $this->getAssetsCards($game->getAssetsCard(), $imageService);
+        $cards = $imageService->getAssetsCards($game->getAssetsCard(), $imageService);
             
         return   [
         "id"=>$game->getId(), 
@@ -60,21 +60,4 @@ class GameObjectService
         ] ;
     }
 
-    public function getAssetsCards(array $cardsAssets, ImageService $imageService): array{
-    
-        $cards = $cardsAssets ?? [];
-    
-        foreach ($cards as $id => $card) {
-            if (isset($card['image']) && $card['image']) {
-                $cards[$id]['url'] = $imageService->getImageUrl(
-                    $card['image'], 
-                    "cards", 
-                    'card_image'
-                );
-            } else {
-                $cards[$id]['image'] = null;
-            }
-        }
-        return $cards;
-    } 
 }

@@ -18,21 +18,14 @@ use Doctrine\ORM\EntityManagerInterface;
 final class CardController extends AbstractController
 {
     #[Route('/api/game/{id}/card/{cardId}/uploadImage', name: 'card_image',methods: ['POST'])]
-    public function addCardImage(Game $game, $cardId, Request $request,ImageService $imageService ,GameObjectService $gameObjectService, EntityManagerInterface $em, TranslatorInterface $translator, Filesystem $filesystem): Response
+    public function addCardImage(Game $game, $cardId, Request $request,ImageService $imageService , EntityManagerInterface $em, TranslatorInterface $translator): Response
     { 
         $assetsCards = $game->getAssetsCard(); 
         if (!isset($assetsCards[$cardId])) {
             return $this->json(['message' => 'Carte non trouvée.'], 404);
         }
-        
-        $oldImage = $assetsCards[$cardId]["image"] ?? null;
-        
-        $folder = $this->getParameter('images_directory') . '/cards';
-        if (!empty($oldImage)) {
-            $oldPath = $folder . '/' . $oldImage;
-            if ($filesystem->exists($oldPath)) {
-                $filesystem->remove($oldPath);
-            }
+        if (!empty($assetsCards[$cardId]["image"])) {
+            $imageService->deleteImage($assetsCards[$cardId]["image"], 'cards');
         }
 
         $file = $request->files->get('file'); 
@@ -41,26 +34,20 @@ final class CardController extends AbstractController
         }
 
         if (!$file->isValid()) {
-            // On récupère le message d'erreur de PHP/Symfony et on le traduit
-            $errorMessage = $translator->trans($file->getErrorMessage());
-            
-            return $this->json([
-                'message' => 'Erreur d\'upload : ' . $errorMessage,
+           return $this->json([
+                'message' => 'Erreur d\'upload : ' . $translator->trans($file->getErrorMessage()),
                 'code' => $file->getError()
             ], 400);
         }
 
-        $newFilename = uniqid() . '.' . $file->guessExtension();
- 
-        $file->move($folder, $newFilename);
+        $newFilename =  $imageService->uploadImage($file, 'cards');
         $assetsCards[$cardId]["image"] = $newFilename; 
          
         $game->setAssetsCard($assetsCards);
-
-        // 6. Sauvegarde
+ 
         $em->persist($game);
         $em->flush();
-            return $this->json($gameObjectService->getAssetsCards([ $assetsCards[$cardId]],$imageService)[0] , 200, [], ['groups' => "games"] );
+        return $this->json($imageService->getAssetsCards([ $assetsCards[$cardId]],$imageService)[0] , 200, [], ['groups' => "games"] );
     }   
     #[Route("api/game/{id}/cards/uploadZip", name: 'card_zip', methods: ['POST'])]
     public function uploadCardZip(
@@ -71,86 +58,38 @@ final class CardController extends AbstractController
         GameObjectService $gameObjectService,
         TranslatorInterface $translator
     ): Response {
+
     $file = $request->files->get('file');
     if (!$file) {
         return $this->json(['message' => $translator->trans('file_not_found')], 400);
     } 
-    //dd(php_ini_loaded_file(), ini_get('upload_max_filesize'));
-    if (!$file->isValid()) {
-        // C'est ici que tu auras la vraie réponse (ex: "The file is too large")
-       return $this->json(['message' =>  $file->getErrorMessage()], 400);
-    }  
-    $newAssetsCards = [];
-    $folder = $this->getParameter('images_directory') . '/cards';
- 
-
-    $zip = new \ZipArchive();
-    $res = $zip->open($file->getRealPath()); 
-    if ($res) { 
-   
-        for ($i = 0; $i < $zip->numFiles; $i++) {
-            $filename = $zip->getNameIndex($i);
-            $fileInfo = pathinfo($filename); 
-            // On ne traite que les images
-            if (isset($fileInfo['extension']) && in_array(strtolower($fileInfo['extension']), ['jpg', 'jpeg', 'png', 'webp'])) {
-                
-                $imageContent = $zip->getFromIndex($i);
-                $newName = uniqid() . '_' . $fileInfo['basename'];
-                
-                // On utilise l'ID (nom du fichier sans extension) pour trouver la carte
-                $cardId = uniqid(); // Par défaut, on génère un ID unique
-                // Si la carte existe dans ton tableau associatif
-               
-                // Sauvegarde physique
-                if (!is_dir($folder)) {
-                    mkdir($folder, 0775, true);
-                }
-                file_put_contents($folder . '/' . $newName, $imageContent);
-                // Mise à jour de l'image pour cette clé précise
-                $newAssetsCards[$cardId] = [
-                    'id' => $cardId,
-                    'image' => $newName,
-                    'name' => $filename,
-                    "type" => "custom",
-                ]; 
-             
-            }
-        }
-        $zip->close();
-    }
- 
-        if (!$res) {
-            $errorMap = [
-                \ZipArchive::ER_EXISTS => "Le fichier existe déjà.",
-                \ZipArchive::ER_INCONS => "L'archive zip est inconsistante.",
-                \ZipArchive::ER_INVAL => "Argument invalide.",
-                \ZipArchive::ER_MEMORY => "Erreur de mémoire.",
-                \ZipArchive::ER_NOENT => "Le fichier n'existe pas.",
-                \ZipArchive::ER_NOZIP => "Ce n'est pas une archive zip valide.",
-                \ZipArchive::ER_OPEN => "Impossible d'ouvrir le fichier.",
-                \ZipArchive::ER_READ => "Erreur de lecture.",
-                \ZipArchive::ER_SEEK => "Erreur de positionnement."
-            ];
-
-            $message = $errorMap[$res] ?? "Erreur inconnue code : " . $res;
-            return $this->json(['message' => $message], 400);
-        }
-
-        // Mettre à jour et sauvegarder
-        $game->setAssetsCard([$game->getAssetsCard(), $newAssetsCards]);
-        $em->persist($game); 
-        $em->flush();
-
     
-        return $this->json(
-            $gameObjectService->getAssetsCards($newAssetsCards,$imageService) , 
-            200, 
-            [],
-            [
-                'groups' => "games",
-                'json_encode_options' => JSON_FORCE_OBJECT // <--- INDISPENSABLE
-            ]
-        );    
+    if (!$file->isValid()) {
+       return $this->json(['message' =>  $translator->trans($file->getErrorMessage())], 400);
+    }  
+
+    $uploadedFiles = [];
+    try {
+        // 1. On confie le traitement du ZIP au service global
+        $uploadedFiles = $imageService->extractImagesFromZipToGetCards($file, 'cards');
+    } catch (\Exception $e) {
+        return $this->json(['message' => $e->getMessage()], 400);
+    }
+
+    // Mettre à jour et sauvegarder
+    $game->setAssetsCard([$game->getAssetsCard(), $uploadedFiles]);
+    $em->persist($game); 
+    $em->flush();
+
+    return $this->json(
+        $imageService->getAssetsCards( $uploadedFiles,$imageService) , 
+        200, 
+        [],
+        [
+            'groups' => "games",
+            'json_encode_options' => JSON_FORCE_OBJECT // <--- INDISPENSABLE
+        ]
+    );    
     } 
     
     #[Route('api/game/{id}/edit/card/{cardId}', name: 'edit_card')]
@@ -178,57 +117,23 @@ final class CardController extends AbstractController
         
     }
       #[Route('api/game/{id}/get/cards', name: 'get_cards',methods: ['GET'])]
-    public function getCards(Game $game, ImageService $imageService): Response
+    public function getCards(Game $game, ImageService $imageService, GameObjectService $gameObjectService): Response
     {  
-
-        $cards = $game->getAssetsCard() ?? [];
-    
-        foreach ($cards as $id => $card) {
-            if (isset($card['image']) && $card['image']) {
-                $cards[$id]['image'] = $imageService->getImageUrl(
-                    $card['image'], 
-                    "card", 
-                    'card_image'
-                );
-            } else {
-                $cards[$id]['image'] = null;
-            }
-        }
-        return $this->json( $cards ,200, [],['groups'=>"games"] );
+ 
+        return $this->json( $imageService->getAssetsCards($game->getAssetsCard(),$imageService) ,200, [],['groups'=>"games"] );
     }
         
     #[Route('api/game/{id}/restore/cards', name: 'restore_card',methods: ['PUT'])]
-    public function restoreCards(Game $game ,  Filesystem $filesystem, EntityManagerInterface $manager): Response
+    public function restoreCards(Game $game ,ImageService $imageService, EntityManagerInterface $manager): Response
     {    
          
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        return $this->json(['message' => 'Données JSON invalides'], 400);
-    }
- 
-    try {
-        $folder = $this->getParameter('images_directory') . '/cards';
-    } catch (\Exception $e) {
-        return $this->json(['message' => 'Configuration du dossier d\'images manquante'], 500);
-    }
- 
-    $assetsCards = $game->getAssetsCard();
- 
-    if (!is_array($assetsCards) || empty($assetsCards)) {
-        return $this->json(['message' => 'Aucune carte à restaurer pour ce jeu'], 200);
-    }
+$assetsCards = $game->getAssetsCard();
 
-    foreach ($assetsCards as $card) {
-        $oldImage = $card["image"] ?? null;
- 
-        if (!empty($oldImage)) {
-            $oldPath = $folder . '/' . $oldImage;
-
-            try {
-                if ($filesystem->exists($oldPath)) {
-                    $filesystem->remove($oldPath);
-                }
-            } catch (\Exception $e) { 
-                continue; 
+    if (is_array($assetsCards) && !empty($assetsCards)) {
+        foreach ($assetsCards as $card) {
+            if (!empty($card["image"])) {
+                // Utilisation de la suppression globale
+                $imageService->deleteImage($card["image"], 'cards');
             }
         }
     }
@@ -259,11 +164,13 @@ final class CardController extends AbstractController
 
     $game->setAssetsCard($cardsConfig);
 
+    // ... Reste de ta logique de génération de $cardsConfig ...
+    $game->setAssetsCard($cardsConfig);
     $manager->persist($game);
     $manager->flush();
-    return $this->json( ["message"=>"ok"],200, [],['groups'=>"games"] );
-            
-      
-        
+
+    return $this->json(["message" => "ok"], 200, [], ['groups' => "games"]);
+   
+ 
     }
 }

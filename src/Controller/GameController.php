@@ -890,6 +890,8 @@ public function testToken(Request $request): Response
         $games = $gameRepository->findBy(["creator"=>$this->getUser()]);
             $gamesToSend = [];
       
+            // remove some data because we get juste simplified list of games
+            // we want preview not details
         foreach($games as $game){ 
             $gameToSend = $this->gameObjectService->getGameObject($game, $this->imageService);
             unset($gameToSend["events"]);
@@ -1159,8 +1161,7 @@ public function testToken(Request $request): Response
                         $isImageChanged = isset($newCards[$id]) && ($newCards[$id]['image'] ?? null) !== $oldImage;
 
                         if ($oldImage && ($isCardRemoved || $isImageChanged)) {
-                            $oldPath = $this->getParameter('images_directory') . '/cards/' . $oldImage;
-                            $imageService->deleteImage($oldPath);
+                             $imageService->deleteImage($oldImage, 'cards');
                         }
                     }
                 
