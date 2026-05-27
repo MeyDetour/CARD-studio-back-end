@@ -18,7 +18,7 @@ use Symfony\Component\Filesystem\Filesystem;
 final class DeckController extends AbstractController
 {
       #[Route('/api/new/deck', name: 'new_deck')]
-    public function newDeck( DeckRepository $deckRepository,  EntityManagerInterface $manager): Response
+    public function newDeck( DeckRepository $deckRepository,  EntityManagerInterface $manager, DeckObjectService $deckObjectService, ImageService $imageService): Response
     {   
         $deck = new Deck();
         $deck->setName("Default name");
@@ -29,7 +29,7 @@ final class DeckController extends AbstractController
         $deck->setParams([]);
         $manager->persist($deck);
         $manager->flush();
-       return $this->json($deck, 200, [], ['groups' => 'deck']);
+       return $this->json($deckObjectService->getDeckObject($deck,$imageService), 200, [], ['groups' => 'deck']);
     }
 
      #[Route('api/deck/edit/{id}', name: 'edit_deck')]
@@ -78,7 +78,7 @@ final class DeckController extends AbstractController
       
         foreach($decks as $deck){ 
             $deckToSend = $deckObjectService->getDeckObject($deck, $imageService);
-            unset($deckToSend["cards"]); 
+           
             unset($deckToSend["params"]); 
             $decksToSend[] = $deckToSend;
         }
