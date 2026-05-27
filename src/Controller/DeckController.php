@@ -17,7 +17,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 final class DeckController extends AbstractController
 {
-      #[Route('/api/new/deck', name: 'new_game')]
+      #[Route('/api/new/deck', name: 'new_deck')]
     public function newDeck( DeckRepository $deckRepository,  EntityManagerInterface $manager): Response
     {   
         $deck = new Deck();
@@ -188,7 +188,7 @@ final class DeckController extends AbstractController
         ]
     );    
     } 
-    #[Route('api/deck/{id}/edit/card/{cardId}', name: 'edit_card')]
+    #[Route('api/deck/{id}/edit/card/{cardId}', name: 'edit_card_deck')]
     public function editCard(Deck $deck ,  $cardId,SerializerInterface $serializer, EntityManagerInterface $manager, Request $request ): Response
     {    
         $data = json_decode($request->getContent(), true);
@@ -213,11 +213,11 @@ final class DeckController extends AbstractController
         
     }
         
-    #[Route('api/game/{id}/restore/cards', name: 'restore_card',methods: ['PUT'])]
-    public function restoreCards(Game $game ,ImageService $imageService, EntityManagerInterface $manager): Response
+    #[Route('api/deck/{id}/restore/cards', name: 'restore_deck',methods: ['PUT'])]
+    public function restoreCards(Deck $deck ,ImageService $imageService, EntityManagerInterface $manager): Response
     {    
          
-$assetsCards = $game->getAssetsCard();
+$assetsCards = $deck->getCards();
 
     if (is_array($assetsCards) && !empty($assetsCards)) {
         foreach ($assetsCards as $card) {
@@ -252,11 +252,11 @@ $assetsCards = $game->getAssetsCard();
             }
         }
 
-    $game->setAssetsCard($cardsConfig);
+    $deck->setCards($cardsConfig);
 
     // ... Reste de ta logique de génération de $cardsConfig ...
-    $game->setAssetsCard($cardsConfig);
-    $manager->persist($game);
+    $deck->setCards($cardsConfig);
+    $manager->persist($deck);
     $manager->flush();
 
     return $this->json(["message" => "ok"], 200, [], ['groups' => "games"]);
