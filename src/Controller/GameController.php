@@ -11,6 +11,7 @@ use App\Repository\GameRepository;
 use App\Service\ImageService;
 use App\Service\TypeService;
 use App\Service\GameObjectService;
+use App\Service\DeckObjectService;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -22,10 +23,12 @@ final class GameController extends AbstractController
 {
     private ImageService $imageService;
     private GameObjectService $gameObjectService;
-    public function __construct(ImageService $imageService, GameObjectService $gameObjectService)
+    private DeckObjectService $deckObjectService;
+    public function __construct(ImageService $imageService, GameObjectService $gameObjectService, DeckObjectService $deckObjectService)
     {
         $this->imageService = $imageService;
         $this->gameObjectService = $gameObjectService;
+        $this->deckObjectService = $deckObjectService;
     }
 
 #[Route('/api/test-token', name: 'app_test_token')]
@@ -45,7 +48,7 @@ public function testToken(Request $request): Response
         $games = $gameRepository->findBy(["isPublic" => true]);
         $gamesToSend = [];
         foreach($games as $game){ 
-            $gameToSend = $this->gameObjectService->getGameObject($game, $this->imageService);
+            $gameToSend = $this->gameObjectService->getGameObject($game, $this->imageService, $this->deckObjectService);
             unset($gameToSend["events"]);
             unset($gameToSend["assets"]);
             unset($gameToSend["playerGlobalValue"]);
@@ -893,7 +896,7 @@ public function testToken(Request $request): Response
             // remove some data because we get juste simplified list of games
             // we want preview not details
         foreach($games as $game){ 
-            $gameToSend = $this->gameObjectService->getGameObject($game, $this->imageService);
+            $gameToSend = $this->gameObjectService->getGameObject($game, $this->imageService, $this->deckObjectService);
             unset($gameToSend["events"]);
             unset($gameToSend["assets"]);
             unset($gameToSend["playerGlobalValue"]);
@@ -1057,7 +1060,7 @@ public function testToken(Request $request): Response
     public function getGame(Game $game): Response
     {    
         if ($game->getCreator() == $this->getUser()){     
-             return $this->json($this->gameObjectService->getGameObject($game, $this->imageService) ,200, [],['groups'=>"game"] );
+             return $this->json($this->gameObjectService->getGameObject($game, $this->imageService,$this->deckObjectService) ,200, [],['groups'=>"game"] );
         }
         return $this->json(  null ,200, [],['groups'=>"games"] );
     }   
@@ -1080,7 +1083,7 @@ public function testToken(Request $request): Response
     #[Route('game/{id}', name: 'get_game_public')]
     public function getGameWithId(Game $game): Response
     {    
-           return $this->json($this->gameObjectService->getGameObject($game, $this->imageService) ,200, [],['groups'=>"game"] );
+           return $this->json($this->gameObjectService->getGameObject($game, $this->imageService, $this->deckObjectService) ,200, [],['groups'=>"game"] );
     }
  
 
@@ -1179,7 +1182,7 @@ public function testToken(Request $request): Response
         };
         $manager->persist($game);
         $manager->flush();
-        return $this->json($this->gameObjectService->getGameObject($game, $this->imageService) ,200, [],['groups'=>"games"] );
+        return $this->json($this->gameObjectService->getGameObject($game, $this->imageService, $this->deckObjectService) ,200, [],['groups'=>"games"] );
         
     }
 

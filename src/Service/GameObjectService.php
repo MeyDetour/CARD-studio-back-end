@@ -1,7 +1,9 @@
 <?php
 
 namespace App\Service;
-
+use App\Entity\Deck;
+use App\Service\ImageService;
+use App\Service\DeckObjectService;
 use App\Entity\Game;
 
 class GameObjectService
@@ -10,7 +12,7 @@ class GameObjectService
     {
 
     }
-    public function getGameObject(Game $game, ImageService $imageService, DeckService $deckService): array{
+    public function getGameObject(Game $game, ImageService $imageService, DeckObjectService $deckService): array{
         $averageNotes = 0; 
         $notes = [];
         foreach ($game->getNotes() as $note){
