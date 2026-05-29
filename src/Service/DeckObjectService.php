@@ -23,6 +23,7 @@ class DeckObjectService
         "params"=>$deck->getParams(),
         "cards"=>$cards,
         "isPublished"=>$deck->isPublished(), 
+        "usageCount"=>count($deck->getGames()),
         
         ] ;
     }

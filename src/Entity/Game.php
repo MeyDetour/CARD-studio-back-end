@@ -112,7 +112,10 @@ class Game
     private ?string $image = null;
 
     #[ORM\Column(nullable: true)]
-    private ?array $eventTriggers = null; 
+    private ?array $eventTriggers = null;
+
+    #[ORM\ManyToOne(inversedBy: 'games')]
+    private ?Deck $deckUsed = null; 
 
  
 
@@ -414,6 +417,18 @@ class Game
     public function setImage(?string $image): static
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    public function getDeckUsed(): ?Deck
+    {
+        return $this->deckUsed;
+    }
+
+    public function setDeckUsed(?Deck $deckUsed): static
+    {
+        $this->deckUsed = $deckUsed;
 
         return $this;
     }

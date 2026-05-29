@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\DeckRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\ORM\Mapping as ORM;
@@ -40,6 +42,17 @@ class Deck
     #[ORM\Column(type: Types::TEXT)]
     #[Groups(['deck'])]
     private ?string $name = null;
+
+    /**
+     * @var Collection<int, Game>
+     */
+    #[ORM\OneToMany(targetEntity: Game::class, mappedBy: 'deckUsed')]
+    private Collection $games;
+
+    public function __construct()
+    {
+        $this->games = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -114,6 +127,36 @@ class Deck
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Game>
+     */
+    public function getGames(): Collection
+    {
+        return $this->games;
+    }
+
+    public function addGame(Game $game): static
+    {
+        if (!$this->games->contains($game)) {
+            $this->games->add($game);
+            $game->setDeckUsed($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGame(Game $game): static
+    {
+        if ($this->games->removeElement($game)) {
+            // set the owning side to null (unless already changed)
+            if ($game->getDeckUsed() === $this) {
+                $game->setDeckUsed(null);
+            }
+        }
 
         return $this;
     }
