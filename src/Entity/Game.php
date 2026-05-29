@@ -429,7 +429,6 @@ class Game
     public function setDeckUsed(?Deck $deckUsed): static
     {
         $this->deckUsed = $deckUsed;
-
         return $this;
     }
  

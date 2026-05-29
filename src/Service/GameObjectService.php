@@ -10,7 +10,7 @@ class GameObjectService
     {
 
     }
-    public function getGameObject(Game $game, ImageService $imageService): array{
+    public function getGameObject(Game $game, ImageService $imageService, DeckService $deckService): array{
         $averageNotes = 0; 
         $notes = [];
         foreach ($game->getNotes() as $note){
@@ -32,12 +32,13 @@ class GameObjectService
         "id"=>$game->getId(), 
         "requestDate"=>new \DateTime(),
         "name"=>$game->getName(),
-        "image"=>$game->getImage()? $imageService->getImageUrl($game->getImage(),    "game" ,'game_image') : null,
+        "image"=>$game->getImage()? $imageService->getImageUrl($game->getImage(),    "game" ) : null,
         "isPublic"=>$game->isPublic(),
         "description"=>$game->getDescription(),
         "averageNotes"=>$averageNotes, 
         "playerCount"=>$game->getPlayerCount(),
         "notes"=>$notes,
+        "deckUsed"=>$game->getDeckUsed() ? $deckService->getDeckObject($game->getDeckUsed(), $imageService) : null,
         "gameCount"=>$game->getGameCount(),
         "types"=>$game->getTypes(), 
         "editionHistory"=>$game->getEditionHistory(),

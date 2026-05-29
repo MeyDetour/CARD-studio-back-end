@@ -1149,6 +1149,9 @@ public function testToken(Request $request): Response
         };
         if( $gameEdited->getEventWithValueEvents() != null){
         $game->setEventWithValueEvents($data["EventWithValueEvents"]);
+        }; 
+         if( $gameEdited->getDeckUsed() != null){
+        $game->setDeckUsed($gameEdited->getDeckUsed());
         };
         $currentCards = $game->getAssetsCard() ?? []; 
         // new cards representent les nouvelles données (incluant aussi les données prééxistantes)
