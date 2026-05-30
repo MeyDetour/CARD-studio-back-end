@@ -117,16 +117,29 @@ final class DeckController extends AbstractController
         }
         return $this->json(  $decksToSend ,200, [],['groups'=>"decks"] );
     } 
-    #[Route('/api/deck/{id}/card/{cardId}/uploadImage', name: 'deck_card_image',methods: ['POST'])]
-    public function addCardImage(Deck $deck, $cardId, Request $request,ImageService $imageService , EntityManagerInterface $em, TranslatorInterface $translator): Response
+    #[Route('/api/deck/{id}/card/uploadImage', name: 'deck_card_image',methods: ['POST'])]
+    public function addCardImage(Deck $deck,  Request $request,ImageService $imageService , EntityManagerInterface $em, TranslatorInterface $translator): Response
     { 
         $assetsCards = $deck->getCards(); 
-        if (!isset($assetsCards[$cardId])) {
-            return $this->json(['message' => 'Carte non trouvée.'], 404);
+       $metadataRaw = $request->request->get("metadata");
+        if (!$metadataRaw) {
+            return $this->json(['message' => 'Metadata manquante.'], 400);
+        }
+        $metadata = json_decode($metadataRaw, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $this->json(['message' => 'Format JSON des metadata invalide.'], 400);
+        }
+
+        $cardId = $metadata["id"] ?? null;
+        if (!$cardId) {
+            return $this->json(['message' => 'ID de carte manquant dans les metadata.'], 400);
         }
         if (!empty($assetsCards[$cardId]["image"])) {
             $imageService->deleteImage($assetsCards[$cardId]["image"], 'cards');
         }
+
+
+        $assetsCards[$cardId] = $metadata;
 
         $file = $request->files->get('file'); 
         if (!$file) {
@@ -147,7 +160,7 @@ final class DeckController extends AbstractController
  
         $em->persist($deck);
         $em->flush();
-        return $this->json($imageService->getAssetsCards([ $assetsCards[$cardId]],$imageService)[0] , 200, [], ['groups' => "decks"] );
+        return $this->json($imageService->getAssetsCards([ $assetsCards[$cardId]])[0] , 200, [], ['groups' => "decks"] );
     }   
       #[Route("api/deck/{id}/cards/uploadZip", name: 'card_zip', methods: ['POST'])]
     public function uploadCardZip(
