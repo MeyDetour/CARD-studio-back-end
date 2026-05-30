@@ -17,6 +17,7 @@ class DeckObjectService
             
         return   [
         "id"=>$deck->getId(),  
+        "uniqueId"=>$deck->getUniqueId(),
         "name"=>$deck->getName(),
         "authorName"=>$deck->getAuthorName(),
         "owner"=>$deck->getOwner() ? $deck->getOwner()->getUsername() : null,
