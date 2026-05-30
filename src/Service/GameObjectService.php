@@ -28,7 +28,7 @@ class GameObjectService
                 $averageNotes = round($averageNotes/count($game->getNotes()) , 1) ;
         }
  
-        $cards = $imageService->getAssetsCards($game->getAssetsCard(), $imageService);
+        $cards = $imageService->getAssetsCards($game->getAssetsCard());
             
         return   [
         "id"=>$game->getId(), 

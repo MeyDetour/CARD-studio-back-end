@@ -13,7 +13,7 @@ class DeckObjectService
     public function getDeckObject(Deck $deck, ImageService $imageService): array{
         
  
-        $cards = $imageService->getAssetsCards($deck->getCards(), $imageService);
+        $cards = $imageService->getAssetsCards($deck->getCards());
             
         return   [
         "id"=>$deck->getId(),  

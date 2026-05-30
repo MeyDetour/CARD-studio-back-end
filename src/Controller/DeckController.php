@@ -179,7 +179,7 @@ final class DeckController extends AbstractController
     $em->flush();
 
     return $this->json(
-        $imageService->getAssetsCards( $uploadedFiles,$imageService) , 
+        $imageService->getAssetsCards( $uploadedFiles) , 
         200, 
         [],
         [

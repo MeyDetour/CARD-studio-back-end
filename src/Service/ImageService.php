@@ -120,13 +120,13 @@ public function extractImagesFromZipToGetCards(\Symfony\Component\HttpFoundation
     return $extractedImages;
 }
 
-    public function getAssetsCards(array $cardsAssets, ImageService $imageService): array{
+    public function getAssetsCards(array $cardsAssets): array{
     
         $cards = $cardsAssets ?? [];
     
         foreach ($cards as $id => $card) {
             if (isset($card['image']) && $card['image']) {
-                $cards[$id]['url'] = $imageService->getImageUrl(
+                $cards[$id]['url'] = $this->getImageUrl(
                     $card['image'], 
                     "cards"
                 );

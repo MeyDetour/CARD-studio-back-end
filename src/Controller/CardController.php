@@ -17,16 +17,30 @@ use Doctrine\ORM\EntityManagerInterface;
 
 final class CardController extends AbstractController
 {
-    #[Route('/api/game/{id}/card/{cardId}/uploadImage', name: 'card_image',methods: ['POST'])]
-    public function addCardImage(Game $game, $cardId, Request $request,ImageService $imageService , EntityManagerInterface $em, TranslatorInterface $translator): Response
+    #[Route('/api/game/{id}/card/uploadImage', name: 'card_image',methods: ['POST'])]
+    public function addCardImage(Game $game, Request $request, ImageService $imageService , EntityManagerInterface $em, TranslatorInterface $translator): Response
     { 
         $assetsCards = $game->getAssetsCard(); 
-        if (!isset($assetsCards[$cardId])) {
-            return $this->json(['message' => 'Carte non trouvée.'], 404);
+
+        $metadataRaw = $request->request->get("metadata");
+        if (!$metadataRaw) {
+            return $this->json(['message' => 'Metadata manquante.'], 400);
+        }
+        $metadata = json_decode($metadataRaw, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $this->json(['message' => 'Format JSON des metadata invalide.'], 400);
+        }
+
+
+        $cardId = $metadata["id"] ?? null;
+        if (!$cardId) {
+            return $this->json(['message' => 'ID de carte manquant dans les metadata.'], 400);
         }
         if (!empty($assetsCards[$cardId]["image"])) {
             $imageService->deleteImage($assetsCards[$cardId]["image"], 'cards');
         }
+
+        $assetsCards[$cardId] = $metadata;
 
         $file = $request->files->get('file'); 
         if (!$file) {
@@ -47,7 +61,7 @@ final class CardController extends AbstractController
  
         $em->persist($game);
         $em->flush();
-        return $this->json($imageService->getAssetsCards([ $assetsCards[$cardId]],$imageService)[0] , 200, [], ['groups' => "games"] );
+        return $this->json($imageService->getAssetsCards([ $assetsCards[$cardId]])[0] , 200, [], ['groups' => "games"] );
     }   
     #[Route("api/game/{id}/cards/uploadZip", name: 'card_zip', methods: ['POST'])]
     public function uploadCardZip(
@@ -82,7 +96,7 @@ final class CardController extends AbstractController
     $em->flush();
 
     return $this->json(
-        $imageService->getAssetsCards( $uploadedFiles,$imageService) , 
+        $imageService->getAssetsCards( $uploadedFiles) , 
         200, 
         [],
         [
@@ -120,7 +134,7 @@ final class CardController extends AbstractController
     public function getCards(Game $game, ImageService $imageService, GameObjectService $gameObjectService): Response
     {  
  
-        return $this->json( $imageService->getAssetsCards($game->getAssetsCard(),$imageService) ,200, [],['groups'=>"games"] );
+        return $this->json( $imageService->getAssetsCards($game->getAssetsCard()) ,200, [],['groups'=>"games"] );
     }
         
     #[Route('api/game/{id}/restore/cards', name: 'restore_card',methods: ['PUT'])]
