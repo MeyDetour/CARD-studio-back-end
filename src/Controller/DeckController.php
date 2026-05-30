@@ -9,6 +9,7 @@ use App\Repository\DeckRepository;
 use App\Service\DeckObjectService;
 use App\Service\ImageService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use App\Entity\Deck;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\SerializerInterface;
