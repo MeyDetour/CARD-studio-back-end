@@ -49,7 +49,7 @@ class Deck
     #[ORM\OneToMany(targetEntity: Game::class, mappedBy: 'deckUsed')]
     private Collection $games;
 
-    #[ORM\Column(type: Types::TEXT,nullable: true)]
+    #[ORM\Column(type: Types::TEXT)]
     private ?string $uniqueId = null;
 
     public function __construct()
