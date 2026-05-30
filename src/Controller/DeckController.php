@@ -25,6 +25,7 @@ final class DeckController extends AbstractController
         $deck->setAuthorName("Unknown");
         $deck->setIsPublished(false);
         $deck->setOwner($this->getUser());
+        $deck->setUniqueId(uniqid().uniqid());
         $deck->setCards([]);
         $deck->setParams([]);
         $manager->persist($deck);
@@ -263,5 +264,22 @@ $assetsCards = $deck->getCards();
    
  
     }
+    #[Route('api/deck/remove/{id}', name: 'remove_deck', methods: ['DELETE'])]
+    public function removeGame(Deck $deck, EntityManagerInterface $manager): Response
+    {    
+        if (!$deck) {
+            return $this->json(["message" => "Deck not found."], 404);
+        }
+        if ($deck->getOwner() == $this->getUser()){     
+            foreach ($deck->getGames() as $game) {
+                $game->setDeckUsed(null);
+                $manager->persist($game);
+            }
+             $manager->remove($deck);
+             $manager->flush();
+             return $this->json( ["message"=>"ok"] ,200 );
+        }
+        return $this->json(  null ,200, [],['groups'=>"games"] );
+    }   
 }
 

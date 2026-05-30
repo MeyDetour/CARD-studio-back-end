@@ -49,6 +49,9 @@ class Deck
     #[ORM\OneToMany(targetEntity: Game::class, mappedBy: 'deckUsed')]
     private Collection $games;
 
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $uniqueId = null;
+
     public function __construct()
     {
         $this->games = new ArrayCollection();
@@ -157,6 +160,18 @@ class Deck
                 $game->setDeckUsed(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUniqueId(): ?string
+    {
+        return $this->uniqueId;
+    }
+
+    public function setUniqueId(string $uniqueId): static
+    {
+        $this->uniqueId = $uniqueId;
 
         return $this;
     }
