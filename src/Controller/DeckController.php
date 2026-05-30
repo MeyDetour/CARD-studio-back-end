@@ -18,7 +18,21 @@ use Symfony\Component\Filesystem\Filesystem;
 
 final class DeckController extends AbstractController
 {
-      #[Route('/api/new/deck', name: 'new_deck')]
+
+      #[Route('/api/get/public/decks', name: 'get_public_decks')]
+    public function getPublicDecks( DeckRepository $deckRepository,   DeckObjectService $deckObjectService, ImageService $imageService): Response
+    {    
+        $decks = $deckRepository->findBy(["isPublished"=>true]);
+        if (!$decks) {
+            return $this->json(["message" => "No public decks found."], 404);
+        }
+        $deckObjects = [];
+        foreach ($decks as $deck) {
+            $deckObjects[] = $deckObjectService->getDeckObject($deck, $imageService);
+        }
+        return $this->json($deckObjects, 200, [], ['groups' => 'deck']);
+    }    
+#[Route('/api/new/deck', name: 'new_deck')]
     public function newDeck( DeckRepository $deckRepository,  EntityManagerInterface $manager, DeckObjectService $deckObjectService, ImageService $imageService): Response
     {   
         $deck = new Deck();
