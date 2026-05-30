@@ -118,7 +118,7 @@ final class DeckController extends AbstractController
         return $this->json(  $decksToSend ,200, [],['groups'=>"decks"] );
     } 
     #[Route('/api/deck/{id}/card/uploadImage', name: 'deck_card_image',methods: ['POST'])]
-    public function addCardImage(Deck $deck,  Request $request,ImageService $imageService , EntityManagerInterface $em, TranslatorInterface $translator): Response
+    public function addCardDeckImage(Deck $deck,  Request $request,ImageService $imageService , EntityManagerInterface $em, TranslatorInterface $translator): Response
     { 
         $assetsCards = $deck->getCards(); 
        $metadataRaw = $request->request->get("metadata");
