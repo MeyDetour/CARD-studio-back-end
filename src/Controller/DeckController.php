@@ -26,6 +26,10 @@ final class DeckController extends AbstractController
          
         $deckObjects = [];
         foreach ($decks as $deck) {
+            if ($deck->getCards()==[] || $deck->getOwner() == $this->getUser() ){
+               continue;
+            }
+
             $deckObjects[] = $deckObjectService->getDeckObject($deck, $imageService);
         }
         return $this->json($deckObjects, 200, [], ['groups' => 'deck']);
