@@ -23,9 +23,7 @@ final class DeckController extends AbstractController
     public function getPublicDecks( DeckRepository $deckRepository,   DeckObjectService $deckObjectService, ImageService $imageService): Response
     {    
         $decks = $deckRepository->findBy(["isPublished"=>true]);
-        if (!$decks) {
-            return $this->json(["message" => "No public decks found."], 404);
-        }
+         
         $deckObjects = [];
         foreach ($decks as $deck) {
             $deckObjects[] = $deckObjectService->getDeckObject($deck, $imageService);
