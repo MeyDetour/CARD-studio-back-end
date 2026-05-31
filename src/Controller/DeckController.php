@@ -83,6 +83,16 @@ final class DeckController extends AbstractController
         if( $deckEdited->getParams() != null){
             $deck->setParams($deckEdited->getParams());
         };
+        if($deckEdited->getName()){
+            $deck->setName($deckEdited->getName());
+        }    
+        if($deckEdited->getAuthorName()){
+            $deck->setAuthorName($deckEdited->getAuthorName());
+        } 
+
+        if ($deckEdited->isPublished() !== null){
+        $deck->setIsPublished($deckEdited->isPublished());
+        }
         $manager->persist($deck);
         $manager->flush();
        return $this->json($deck, 200, [], ['groups' => 'deck']);
