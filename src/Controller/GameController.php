@@ -1079,7 +1079,7 @@ public function testToken(Request $request): Response
         return $this->json(  null ,200, [],['groups'=>"games"] );
     }   
     
-    #[Route('api/game/{id}/use/deck/', name: 'use_deck', methods: ['GET'])]
+    #[Route('api/game/{id}/use/deck/', name: 'use_deck', methods: ['POST'])]
     public function useDeck(Game $game, EntityManagerInterface $manager, DeckRepository $deckRepository, Request $request): Response
     {    
         if (!$game) {
