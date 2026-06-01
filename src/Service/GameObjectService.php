@@ -27,9 +27,15 @@ class GameObjectService
         if ($averageNotes > 0 ){
                 $averageNotes = round($averageNotes/count($game->getNotes()) , 1) ;
         }
- 
-        $cards = $imageService->getAssetsCards($game->getAssetsCard());
+
+        $cards = [];
+        $deck = $game->getDeckUsed();
+        if ($deck){
+        $cards = $imageService->getAssetsCards($deck->getCards());
+        } 
+         
             
+
         return   [
         "id"=>$game->getId(), 
         "requestDate"=>new \DateTime(),
