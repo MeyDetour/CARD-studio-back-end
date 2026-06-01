@@ -1079,6 +1079,31 @@ public function testToken(Request $request): Response
         return $this->json(  null ,200, [],['groups'=>"games"] );
     }   
     
+    #[Route('api/game/{id}/use/deck/', name: 'use_deck', methods: ['GET'])]
+    public function useDeck(Game $game, EntityManagerInterface $manager, DeckRepository $deckRepository, Request $request): Response
+    {    
+        if (!$game) {
+            return $this->json(["message" => "Game not found."], 404);
+        }
+        $data = json_decode($request->getContent(), true);
+        $uniqueId = $data["uniqueId"] ?? null;
+        if (!$uniqueId) {
+            return $this->json(["message" => "UniqueId is required."], 400);
+        }
+        $deck = $deckRepository->findOneBy(["uniqueId" => $uniqueId]);
+        if (!$deck) {
+            return $this->json(["message" => "Deck not found."], 404);
+        }
+        
+        if ($game->getCreator() == $this->getUser()){     
+            $game->setDeckUsed($deck);
+             $manager->persist($game);
+             $manager->flush();
+             return $this->json( ["message"=>"ok"] ,200 );
+        }
+        return $this->json(  null ,200, [],['groups'=>"games"] );
+    }   
+    
 
     #[Route('game/{id}', name: 'get_game_public')]
     public function getGameWithId(Game $game): Response

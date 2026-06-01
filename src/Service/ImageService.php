@@ -94,6 +94,7 @@ public function extractImagesFromZipToGetCards(\Symfony\Component\HttpFoundation
         throw new \Exception($errorMap[$res] ?? "Erreur ZIP inconnue code : " . $res);
     }
 
+    $count = 1;
     for ($i = 0; $i < $zip->numFiles; $i++) {
         $filename = $zip->getNameIndex($i);
         $fileInfo = pathinfo($filename);
@@ -101,6 +102,7 @@ public function extractImagesFromZipToGetCards(\Symfony\Component\HttpFoundation
         // On ne filtre que les extensions d'images valides
         if (isset($fileInfo['extension']) && in_array(strtolower($fileInfo['extension']), ['jpg', 'jpeg', 'png', 'webp'])) {
             $imageContent = $zip->getFromIndex($i);
+            
             
             // On réutilise notre méthode binaire existante !
             $newName = $this->saveImageFromBinary($imageContent, $filename, $subFolder);
@@ -111,7 +113,9 @@ public function extractImagesFromZipToGetCards(\Symfony\Component\HttpFoundation
                     'image' => $newName,
                     'name' => $filename,
                     "type" => "custom",
+                    "order "=> $count,
                 ];
+            $count++;
         }
     }
 
