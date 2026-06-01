@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Game;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\GameRepository;
+use App\Repository\DeckRepository;
 use App\Service\ImageService;
 use App\Service\TypeService;
 use App\Service\GameObjectService;
