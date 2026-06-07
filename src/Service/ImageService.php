@@ -113,6 +113,7 @@ public function extractImagesFromZipToGetCards(\Symfony\Component\HttpFoundation
                     'image' => $newName,
                     'name' => $filename,
                     "type" => "custom",
+                    quantity"=> 1,
                     "order "=> $count,
                 ];
             $count++;
