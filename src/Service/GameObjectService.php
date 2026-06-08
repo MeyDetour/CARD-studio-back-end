@@ -28,43 +28,49 @@ class GameObjectService
                 $averageNotes = round($averageNotes/count($game->getNotes()) , 1) ;
         }
 
-        $cards = [];
-        $deck = $game->getDeckUsed();
-        if ($deck){
+   $cards = [];
+    $deckParams = [];
+    $deck = $game->getDeckUsed();
+    if ($deck) {
         $cards = $imageService->getAssetsCards($deck->getCards());
-        } 
-         
-            
+        $deckParams = $deck->getParams(); // C'est ici que c'était dangereux !
+    }
 
+    // 4. Fusion propre des paramètres
+    $gameParams = $game->getParams() ?? [];
+    $params = array_merge_recursive(
+        $gameParams,
+        ["cards" => array_merge_recursive($gameParams["cards"] ?? [], $deckParams)]
+    );
         return   [
-        "id"=>$game->getId(), 
-        "requestDate"=>new \DateTime(),
-        "name"=>$game->getName(),
-        "image"=>$game->getImage()? $imageService->getImageUrl($game->getImage(),    "game" ) : null,
-        "isPublic"=>$game->isPublic(),
-        "description"=>$game->getDescription(),
-        "averageNotes"=>$averageNotes, 
-        "playerCount"=>$game->getPlayerCount(),
-        "notes"=>$notes,
-         "gameCount"=>$game->getGameCount(),
-        "types"=>$game->getTypes(), 
-        "editionHistory"=>$game->getEditionHistory(),
-        "globalValue"=>$game->getglobalValue(),
-        "globalValueStatic"=>$game->getglobalValueStatic() ?? [],
-        "playerGlobalValue"=>$game->getPlayerGlobalValue(),
-        "params"=>$game->getParams(),
-        "events"=>[ 
-            "triggers"=>$game->getEventTriggers(),
-            "events"=>$game->getEventEvents(),
-            "win"=>$game->getEventWin(),
-            "loose"=>$game->getEventLoose(),
-            "withValueEvent"=>$game->getEventWithValueEvents()
-        ],
-        "assets"=>[
-            "cards"=>$cards,
-            "gains"=>$game->getAssetsGain(),
-            "roles"=>$game->getRoles(),
-        ]
+            "id"=>$game->getId(), 
+            "requestDate"=>new \DateTime(),
+            "name"=>$game->getName(),
+            "image"=>$game->getImage()? $imageService->getImageUrl($game->getImage(),    "game" ) : null,
+            "isPublic"=>$game->isPublic(),
+            "description"=>$game->getDescription(),
+            "averageNotes"=>$averageNotes, 
+            "playerCount"=>$game->getPlayerCount(),
+            "notes"=>$notes,
+            "gameCount"=>$game->getGameCount(),
+            "types"=>$game->getTypes(), 
+            "editionHistory"=>$game->getEditionHistory(),
+            "globalValue"=>$game->getglobalValue(),
+            "globalValueStatic"=>$game->getglobalValueStatic() ?? [],
+            "playerGlobalValue"=>$game->getPlayerGlobalValue(),
+            "params"=>$params,
+            "events"=>[ 
+                "triggers"=>$game->getEventTriggers(),
+                "events"=>$game->getEventEvents(),
+                "win"=>$game->getEventWin(),
+                "loose"=>$game->getEventLoose(),
+                "withValueEvent"=>$game->getEventWithValueEvents()
+            ],
+            "assets"=>[
+                "cards"=>$cards,
+                "gains"=>$game->getAssetsGain(),
+                "roles"=>$game->getRoles(),
+            ]
         ] ;
     }
 
