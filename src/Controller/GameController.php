@@ -862,9 +862,9 @@ public function testToken(Request $request): Response
 
                     $cardsConfig[$id] = [
                         'id' => $id,
-                        'value' => $value,
                         'type' => "french_standard",
                         'addedAttributs' => [
+                            'value' => $value,
                             'couleur' => $colorName
                         ]
                     ];
@@ -1038,11 +1038,12 @@ public function testToken(Request $request): Response
 
                     $cardsConfig[$id] = [
                         'id' => $id,
-                    'name' => $value . " de " . $colorName,
-                        'value' => $value,
+                        'name' => $value . " de " . $colorName,
+                        
                         'type' => "french_standard",
                         'addedAttributs' => [
-                            'couleur' => $colorName
+                            'couleur' => $colorName,
+                            'value' => $value
                         ]
                     ];
                 }

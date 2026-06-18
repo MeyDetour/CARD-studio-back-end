@@ -284,9 +284,10 @@ $assetsCards = $deck->getCards();
                 $cardsConfig[$id] = [
                     'id' => $id,
                     'name' => $value . " de " . $colorName,
-                    'value' => $value,
                     'type' => "french_standard",
                     'addedAttributs' => [
+
+                        'value' => $value,
                         'couleur' => $colorName
                     ]
                 ];
