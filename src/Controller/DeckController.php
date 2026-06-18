@@ -301,7 +301,7 @@ $assetsCards = $deck->getCards();
     $manager->persist($deck);
     $manager->flush();
 
-    return $this->json(["message" => "ok"], 200, [], ['groups' => "games"]);
+    return $this->json($cardsConfig, 200, [], ['groups' => "games"]);
    
  
     }
