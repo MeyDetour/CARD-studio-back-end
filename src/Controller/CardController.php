@@ -136,58 +136,6 @@ final class CardController extends AbstractController
  
         return $this->json( $imageService->getAssetsCards($game->getAssetsCard()) ,200, [],['groups'=>"games"] );
     }
-        
-    #[Route('api/game/{id}/restore/cards', name: 'restore_card',methods: ['PUT'])]
-    public function restoreCards(Game $game ,ImageService $imageService, EntityManagerInterface $manager): Response
-    {    
          
-$assetsCards = $game->getAssetsCard();
-
-    if (is_array($assetsCards) && !empty($assetsCards)) {
-        foreach ($assetsCards as $card) {
-            if (!empty($card["image"])) {
-                // Utilisation de la suppression globale
-                $imageService->deleteImage($card["image"], 'cards');
-            }
-        }
-    }
-
-    $cardsConfig = [];
-    $colors = [
-            'pique'   => range(1, 13),
-            'trefle' => range(14, 26),
-            'coeur'   => range(27, 39),
-            'carreau' => range(40, 52),
-        ];
-        foreach ($colors as $colorName => $range) {
-            foreach ($range as $index => $id) {
-                // La valeur de la carte va de 1 à 13 pour chaque couleur
-                $value = $index + 1; 
-
-                $cardsConfig[$id] = [
-                    'id' => $id,
-                    'name' => $value . " de " . $colorName,
-                    'type' => "french_standard",
-                    'addedAttributs' => [
-
-                        'value' => $value,
-                        'symbol' => $colorName,
-                        'color' => $colorName === 'coeur' || $colorName === 'carreau' ? 'red' : 'black',
-                    ]
-                ];
-            }
-        }
-
-    $game->setAssetsCard($cardsConfig);
-
-    // ... Reste de ta logique de génération de $cardsConfig ...
-    $game->setAssetsCard($cardsConfig);
-    $manager->persist($game);
-    $manager->flush();
-
-    return $this->json(["message" => "ok"], 200, [], ['groups' => "games"]);
-   
- 
-    }
     
 }

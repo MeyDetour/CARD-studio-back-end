@@ -276,25 +276,31 @@ $assetsCards = $deck->getCards();
             'coeur'   => range(27, 39),
             'carreau' => range(40, 52),
         ];
-        foreach ($colors as $colorName => $range) {
-            foreach ($range as $index => $id) {
-                // La valeur de la carte va de 1 à 13 pour chaque couleur
-                $value = $index + 1; 
+    foreach ($colors as $colorName => $range) {
+        foreach ($range as $index => $id) {
+            // La valeur de la carte va de 1 à 13 pour chaque couleur
+            $value = $index + 1; 
 
-                $cardsConfig[$id] = [
-                    'id' => $id,
-                    'name' => $value . " de " . $colorName,
-                    'type' => "french_standard",
-                    'addedAttributs' => [
+            $cardsConfig[$id] = [
+                'id' => $id,
+                'name' => $value . " de " . $colorName,
+                'type' => "french_standard",
+                'addedAttributs' => [
 
-                        'value' => $value,
-                        'symbol' => $colorName,
-                        'color' => $colorName === 'coeur' || $colorName === 'carreau' ? 'red' : 'black',
-                    ]
-                ];
-            }
+                    'value' => $value,
+                    'symbol' => $colorName,
+                    'color' => $colorName === 'coeur' || $colorName === 'carreau' ? 'red' : 'black',
+                ]
+            ];
         }
-
+    }
+    $params = $deck->getParams();
+    $params["addedAttributs"] = [
+        "value" =>"",
+        "symbol" => "",
+        "color" => ""
+    ];
+    $deck->setParams($params);
     $deck->setCards($cardsConfig);
 
     // ... Reste de ta logique de génération de $cardsConfig ...
@@ -302,7 +308,7 @@ $assetsCards = $deck->getCards();
     $manager->persist($deck);
     $manager->flush();
 
-    return $this->json($cardsConfig, 200, [], ['groups' => "games"]);
+    return $this->json($deck, 200);
    
  
     }
