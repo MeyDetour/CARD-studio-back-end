@@ -288,7 +288,8 @@ $assetsCards = $deck->getCards();
                     'addedAttributs' => [
 
                         'value' => $value,
-                        'couleur' => $colorName
+                        'symbol' => $colorName,
+                        'color' => $colorName === 'coeur' || $colorName === 'carreau' ? 'red' : 'black',
                     ]
                 ];
             }
