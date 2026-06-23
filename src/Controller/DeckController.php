@@ -50,52 +50,68 @@ final class DeckController extends AbstractController
        return $this->json($deckObjectService->getDeckObject($deck,$imageService), 200, [], ['groups' => 'deck']);
     }
 
-     #[Route('api/deck/edit/{id}', name: 'edit_deck')]
-    public function editDeck(Deck $deck ,  SerializerInterface $serializer, EntityManagerInterface $manager, Request $request , TypeService $typeService,Filesystem $filesystem,ImageService $imageService): Response
-    {   
-        $deckEdited = $serializer->deserialize($request->getContent(), Deck::class, 'json');
-      
-        if (!$typeService->verify($deckEdited->getName(), "string")) {
-            return $this->json(["message" => "Invalid name. (field : name, accepted : string)"], 406);
-        };
-        if (!$typeService->verify($deckEdited->getAuthorName(), "string")) {
-            return $this->json(["message" => "Invalid author name. (field : authorName, accepted : string)"], 406);
-        }; 
- 
-         $currentCards = $deck->getCards() ?? []; 
-        // new cards representent les nouvelles données (incluant aussi les données prééxistantes)
-        $newCards =$deckEdited->getCards() ?? [];
+     #[Route('api/deck/edit/{id}', name: 'edit_deck', methods: ['PUT', 'PATCH'])]
+    public function editDeck(Deck $deck, EntityManagerInterface $manager, Request $request, ImageService $imageService, DeckObjectService $deckObjectService): Response
+    {
+        $data = json_decode($request->getContent(), true);
 
-        if ($newCards !== null) {
+        if (!is_array($data)) {
+            return $this->json(["message" => "Invalid JSON payload."], 400);
+        }
+
+        if (array_key_exists('name', $data)) {
+            if (!is_string($data['name'])) {
+                return $this->json(["message" => "Invalid name. (field : name, accepted : string)"], 406);
+            }
+            $deck->setName($data['name']);
+        }
+
+        if (array_key_exists('authorName', $data)) {
+            if (!is_string($data['authorName'])) {
+                return $this->json(["message" => "Invalid author name. (field : authorName, accepted : string)"], 406);
+            }
+            $deck->setAuthorName($data['authorName']);
+        }
+
+        if (array_key_exists('cards', $data)) {
+            if (!is_array($data['cards']) && $data['cards'] !== null) {
+                return $this->json(["message" => "Invalid cards. (field : cards, accepted : array|null)"], 406);
+            }
+
+            $currentCards = $deck->getCards() ?? [];
+            $newCards = $data['cards'] ?? [];
+
             foreach ($currentCards as $id => $cardData) {
-                        $oldImage = $cardData['image'] ?? null;
-                        $isCardRemoved = !isset($newCards[$id]);
-                        $isImageChanged = isset($newCards[$id]) && ($newCards[$id]['image'] ?? null) !== $oldImage;
+                $oldImage = $cardData['image'] ?? null;
+                $isCardRemoved = !isset($newCards[$id]);
+                $isImageChanged = isset($newCards[$id]) && ($newCards[$id]['image'] ?? null) !== $oldImage;
 
-                        if ($oldImage && ($isCardRemoved || $isImageChanged)) {
-                             $imageService->deleteImage($oldImage, 'cards');
-                        }
-                    }
-                
-                // 3. On applique les nouvelles cartes
-                $deck->setCards($newCards);
-        }
-        if( $deckEdited->getParams() != null){
-            $deck->setParams($deckEdited->getParams());
-        };
-        if($deckEdited->getName()){
-            $deck->setName($deckEdited->getName());
-        }    
-        if($deckEdited->getAuthorName()){
-            $deck->setAuthorName($deckEdited->getAuthorName());
-        } 
+                if ($oldImage && ($isCardRemoved || $isImageChanged)) {
+                    $imageService->deleteImage($oldImage, 'cards');
+                }
+            }
 
-        if ($deckEdited->isPublished() !== null){
-        $deck->setIsPublished($deckEdited->isPublished());
+            $deck->setCards($newCards);
         }
+
+        if (array_key_exists('params', $data)) {
+            if (!is_array($data['params'])) {
+                return $this->json(["message" => "Invalid params. (field : params, accepted : array)"], 406);
+            }
+            $deck->setParams($data['params']);
+        }
+
+        if (array_key_exists('isPublished', $data)) {
+            if (!is_bool($data['isPublished'])) {
+                return $this->json(["message" => "Invalid isPublished. (field : isPublished, accepted : boolean)"], 406);
+            }
+            $deck->setIsPublished($data['isPublished']);
+        }
+
         $manager->persist($deck);
         $manager->flush();
-       return $this->json($deck, 200, [], ['groups' => 'deck']);
+
+        return $this->json($deckObjectService->getDeckObject($deck, $imageService), 200, [], ['groups' => 'deck']);
     }
 
       #[Route('/api/my/decks', name: 'get_decks_of_user')]
