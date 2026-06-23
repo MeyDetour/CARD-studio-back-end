@@ -44,7 +44,7 @@ final class DeckController extends AbstractController
         $deck->setOwner($this->getUser());
         $deck->setUniqueId(uniqid().uniqid());
         $deck->setCards([]);
-        $deck->setParams([]);
+        $deck->setParams(["addedAttributs"=>[]]);
         $manager->persist($deck);
         $manager->flush();
        return $this->json($deckObjectService->getDeckObject($deck,$imageService), 200, [], ['groups' => 'deck']);
