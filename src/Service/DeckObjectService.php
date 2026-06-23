@@ -21,7 +21,7 @@ class DeckObjectService
         "name"=>$deck->getName(),
         "authorName"=>$deck->getAuthorName(),
         "owner"=>$deck->getOwner() ? $deck->getOwner()->getUsername() : null,
-        "params"=>$deck->getParams(),
+        "params"=>$deck->getParams()??[],
         "cards"=>$cards,
         "isPublished"=>$deck->isPublished(), 
         "usageCount"=>count($deck->getGames()),
