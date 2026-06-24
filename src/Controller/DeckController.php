@@ -35,7 +35,7 @@ final class DeckController extends AbstractController
         return $this->json($deckObjects, 200, [], ['groups' => 'deck']);
     }    
 #[Route('/api/new/deck', name: 'new_deck')]
-    public function newDeck( DeckRepository $deckRepository,  EntityManagerInterface $manager, DeckObjectService $deckObjectService, ImageService $imageService): Response
+    public function newDeck( DeckRepository $deckRepository,DeckObjectService $deckObjectService, EntityManagerInterface $manager, ImageService $imageService): Response
     {   
         $deck = new Deck();
         $deck->setName("Default name");
@@ -43,8 +43,8 @@ final class DeckController extends AbstractController
         $deck->setIsPublished(false);
         $deck->setOwner($this->getUser());
         $deck->setUniqueId(uniqid().uniqid());
-        $deck->setCards([]);
-        $deck->setParams(["addedAttributs"=>[]]);
+        $deckObjectService->settDefaultDeckCards($deck);
+        
         $manager->persist($deck);
         $manager->flush();
        return $this->json($deckObjectService->getDeckObject($deck,$imageService), 200, [], ['groups' => 'deck']);
@@ -271,7 +271,7 @@ final class DeckController extends AbstractController
     }
         
     #[Route('api/deck/{id}/restore/cards', name: 'restore_deck',methods: ['PUT'])]
-    public function restoreCards(Deck $deck ,ImageService $imageService, EntityManagerInterface $manager): Response
+    public function restoreCards(Deck $deck ,ImageService $imageService, DeckObjectService $deckObjectService, EntityManagerInterface $manager): Response
     {    
          
 $assetsCards = $deck->getCards();
@@ -285,42 +285,8 @@ $assetsCards = $deck->getCards();
         }
     }
 
-    $cardsConfig = [];
-    $colors = [
-            'pique'   => range(1, 13),
-            'trefle' => range(14, 26),
-            'coeur'   => range(27, 39),
-            'carreau' => range(40, 52),
-        ];
-    foreach ($colors as $colorName => $range) {
-        foreach ($range as $index => $id) {
-            // La valeur de la carte va de 1 à 13 pour chaque couleur
-            $value = $index + 1; 
-
-            $cardsConfig[$id] = [
-                'id' => $id,
-                'name' => $value . " de " . $colorName,
-                'type' => "french_standard",
-                'addedAttributs' => [
-
-                    'value' => $value,
-                    'symbol' => $colorName,
-                    'color' => $colorName === 'coeur' || $colorName === 'carreau' ? 'red' : 'black',
-                ]
-            ];
-        }
-    }
-    $params = $deck->getParams();
-    $params["addedAttributs"] = [
-        "value" =>"",
-        "symbol" => "",
-        "color" => ""
-    ];
-    $deck->setParams($params);
-    $deck->setCards($cardsConfig);
-
     // ... Reste de ta logique de génération de $cardsConfig ...
-    $deck->setCards($cardsConfig);
+    $deckObjectService->settDefaultDeckCards($deck);
     $manager->persist($deck);
     $manager->flush();
 
