@@ -43,7 +43,7 @@ final class DeckController extends AbstractController
         $deck->setIsPublished(false);
         $deck->setOwner($this->getUser());
         $deck->setUniqueId(uniqid().uniqid());
-        $deckObjectService->settDefaultDeckCards($deck);
+        $deck =$deckObjectService->settDefaultDeckCards($deck);
         
         $manager->persist($deck);
         $manager->flush();
@@ -286,7 +286,9 @@ $assetsCards = $deck->getCards();
     }
 
     // ... Reste de ta logique de génération de $cardsConfig ...
-    $deckObjectService->settDefaultDeckCards($deck);
+    $newDeck = $deckObjectService->settDefaultDeckCards($deck);
+    $deck->setParams($newDeck->getParams());
+    $deck->setCards($newDeck->getCards());
     $manager->persist($deck);
     $manager->flush();
 
