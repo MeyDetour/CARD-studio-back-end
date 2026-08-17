@@ -1,6 +1,6 @@
 FROM php:8.2-cli-alpine
 
-# 1. Installation des dépendances système et extensions PostgreSQL / Symfony
+# 1. Dépendances système et extensions
 RUN apk add --no-cache \
     git \
     unzip \
@@ -8,7 +8,6 @@ RUN apk add --no-cache \
     icu-dev \
     libzip-dev \
     bash \
-    curl \
     && docker-php-ext-install -j$(nproc) \
         pdo \
         pdo_pgsql \
@@ -17,21 +16,17 @@ RUN apk add --no-cache \
         zip \
         opcache
 
-# 2. Installation de Composer
+# 2. Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# 3. Installation du binaire Symfony CLI
-RUN curl -sS https://get.symfony.com/cli/installer | bash \
-    && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
 
 WORKDIR /app
 
-# 4. Copie du projet
+# 3. Copie des fichiers
 COPY . /app
 
-# 5. Installation des dépendances Composer (sans dev en prod)
+# 4. Installation des paquets SANS exécuter les scripts Symfony au build
 ENV COMPOSER_ALLOW_SUPERUSER=1
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev || true
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-scripts
 
-# 6. Démarrage du serveur Symfony en écoute sur 0.0.0.0 et le port Railway ($PORT)
-CMD ["sh", "-c", "symfony server:start --no-tls --port=${PORT:-8080} --allow-all-ip"]
+# 5. Démarrage du serveur PHP sur le port dynamique Railway
+CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t public/"]
