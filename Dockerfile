@@ -1,42 +1,37 @@
-FROM php:8.2-apache
+FROM php:8.2-cli-alpine
 
-# 1. Dépendances système et extensions PHP
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# 1. Installation des dépendances système et extensions PostgreSQL / Symfony
+RUN apk add --no-cache \
     git \
     unzip \
     libpq-dev \
-    libicu-dev \
+    icu-dev \
     libzip-dev \
-    zip \
-    && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
+    bash \
+    curl \
     && docker-php-ext-install -j$(nproc) \
         pdo \
         pdo_pgsql \
         pgsql \
         intl \
         zip \
-        opcache \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+        opcache
 
-# 2. Correction radicale des MPM : suppression physique des liens symboliques superflus
-RUN rm -f /etc/apache2/mods-enabled/mpm_event.* /etc/apache2/mods-enabled/mpm_worker.* \
-    && ln -sf /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/ \
-    && ln -sf /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/ \
-    && a2enmod rewrite
-
-# 3. DocumentRoot pour Symfony
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
-    && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-
-# 4. Installation de Composer
+# 2. Installation de Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www/html
-COPY . /var/www/html
+# 3. Installation du binaire Symfony CLI
+RUN curl -sS https://get.symfony.com/cli/installer | bash \
+    && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
 
-# 5. Droits et commande de démarrage explicite
-RUN chown -R www-data:www-data /var/www/html/var || true
+WORKDIR /app
 
-# Lancement officiel d'Apache pour Debian/Ubuntu
-CMD ["apache2-foreground"]
+# 4. Copie du projet
+COPY . /app
+
+# 5. Installation des dépendances Composer (sans dev en prod)
+ENV COMPOSER_ALLOW_SUPERUSER=1
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev || true
+
+# 6. Démarrage du serveur Symfony en écoute sur 0.0.0.0 et le port Railway ($PORT)
+CMD ["sh", "-c", "symfony server:start --no-tls --port=${PORT:-8080} --allow-all-ip"]
