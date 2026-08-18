@@ -1,6 +1,6 @@
 FROM php:8.3-cli-alpine
 
-# 1. Extensions et paquets nécessaires
+# 1. Dépendances système et extensions
 RUN apk add --no-cache \
     git \
     unzip \
@@ -21,13 +21,16 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
-# 3. Copie du projet
+# 3. Copie du code
 COPY . /app
 
-# 4. Installation complète des dépendances et génération de l'autoloader
+# 4. Installation des dépendances Composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-scripts \
-    && composer dump-autoload --optimize
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-scripts
 
-# 5. Démarrage de PHP sur le port dynamique Railway
+# 5. Téléchargement des assets JS (ImportMap) et compilation des assets Symfony
+RUN php bin/console importmap:install --no-interaction \
+    && php bin/console asset-map:compile --no-interaction || true
+
+# 6. Démarrage de PHP
 CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t public/"]
