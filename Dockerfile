@@ -33,5 +33,6 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-s
 RUN php bin/console importmap:install --no-interaction \
     && php bin/console asset-map:compile --no-interaction || true
 
-# 6. Démarrage de PHP
-CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t public/"]
+# 6. Démarrage de PHP 
+
+CMD ["sh", "-c", "php bin/console doctrine:schema:update --force --no-interaction && php -S 0.0.0.0:${PORT:-8080} -t public/"]
