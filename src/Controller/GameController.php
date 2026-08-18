@@ -60,7 +60,7 @@ public function testToken(Request $request): Response
 
        return $this->json(  $gamesToSend, 200);
     }
-    #[Route('/api/my/games', name: 'get_games_of_user')]
+    #[Route('/api/my/games', name: 'get_games_of_user',methods:['GET'])]
     public function getMyGames( GameRepository $gameRepository,  EntityManagerInterface $manager): Response
     { 
         if(count($this->getUser()->getGames()) === 0){
