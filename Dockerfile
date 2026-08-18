@@ -4,10 +4,12 @@ FROM php:8.3-cli-alpine
 RUN apk add --no-cache \
     git \
     unzip \
+    libpq \
     libpq-dev \
     icu-dev \
     libzip-dev \
     bash \
+    && docker-php-ext-configure pgsql -with-pgsql=/usr/include/postgresql/ \
     && docker-php-ext-install -j$(nproc) \
         pdo \
         pdo_pgsql \
@@ -15,7 +17,6 @@ RUN apk add --no-cache \
         intl \
         zip \
         opcache
-
 # 2. Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
