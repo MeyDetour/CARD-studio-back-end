@@ -37,4 +37,4 @@ RUN php bin/console asset-map:compile --no-interaction
 CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t public/"]
 
 
-# Dont forget to generate your key paris
+CMD ["sh", "-c", "mkdir -p config/jwt && php bin/console lexik:jwt:generate-keypair --skip-if-exists --no-interaction && php bin/console doctrine:schema:update --force --no-interaction && php -S 0.0.0.0:${PORT:-8080} -t public/"]
