@@ -30,4 +30,10 @@ RUN composer install \
     --optimize-autoloader \
     --no-scripts
 
+    # Installer les dépendances JavaScript gérées par Importmap
+RUN php bin/console importmap:install --no-interaction
+
+# Compiler les assets pour la production
+RUN php bin/console asset-map:compile --no-interaction
+
 CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t public/"]
